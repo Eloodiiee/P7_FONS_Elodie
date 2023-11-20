@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Site de recette de cuisine" />
+        <link rel="stylesheet" href="./styles/style.css" />
+        <link rel="icon" type="image/svg" href="./assets/img/favicon.svg" />
+        <script src="scripts/utils/font-awesome.js"></script>
+    </head>
+    <body>
+        <header>
+            <div id="header_full">
+                <img src="./assets/img/background_header.png" alt="" id="background_header" />
+                <div id="header_element">
+                    <img src="./assets/img/logo.png" alt="Logo Les petits plats" id="logo" />
+                    <div id="header_textAndSearchbar">
+                        <h1 id="header_text">
+                            CHERCHEZ PARMI PLUS DE 1500 RECETTES <br />
+                            DU QUOTIDIEN,SIMPLES ET DÉLICIEUSES
+                        </h1>
+                        <div id="searchBar">
+                            <input type="text" id="inputSearchBar" placeholder="Rechercher une recette, un ingrédient, un appareil, ou un ustensile" />
+                            <button type="submit" id="searchBtnIcon">
+                                <i class="fa-thin fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main>
+            <div id="advancedFilter-container">
+                <div id="ingredientsFilter" class="advancedFilter" data-type="ingrédients">
+                    <div class="advancedFilter-InputChevron">
+                        <p class="advancedFilterName">Ingrédients</p>
+                        <div class="chevron">
+                            <i class="fas fa-chevron-down" id="ingredients-chevron"></i>
+                        </div>
+                    </div>
+                    <div id="ingredients-container" class="ul-container">
+                        <div class="inputContainer">
+                            <input type="text" name="ingredients" class="input-tag" id="ingredients" placeholder="" />
+                            <i class="fa-thin fa-magnifying-glass"></i>
+                        </div>
+                        <ul id="ingredients-list" class="li-list"></ul>
+                    </div>
+                </div>
+
+                <div id="appliancesFilter" class="advancedFilter" data-type="appliances">
+                    <div class="advancedFilter-InputChevron">
+                        <p class="advancedFilterName">Appareils</p>
+                        <div class="chevron">
+                            <i class="fas fa-chevron-down" id="appliances-chevron"></i>
+                        </div>
+                    </div>
+                    <div id="appliances-container" class="ul-container">
+                        <div class="inputContainer">
+                            <input type="text" name="appareils" id="appliances" class="input-tag" placeholder="" />
+                            <i class="fa-thin fa-magnifying-glass"></i>
+                        </div>
+                        <ul id="appliances-list" class="li-list">
+                            <li>aaa</li>
+                            <li>aaa</li>
+                            <li>aaa</li>
+                            <li>aaa</li>
+                            <li>aaa</li>
+                            <li>aaa</li>
+                            <li>aaa</li>
+                            <li>aaa</li>
+                            <li>aaa</li>
+                            <li>aaa</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="ustensilsFilter" class="advancedFilter" data-type="ustensils">
+                    <div class="advancedFilter-InputChevron">
+                        <p class="advancedFilterName">Ustensiles</p>
+                        <div class="chevron">
+                            <i class="fas fa-chevron-down" id="ustensils-chevron"></i>
+                        </div>
+                    </div>
+                    <div id="ustensils-container" class="ul-container">
+                        <div class="inputContainer">
+                            <input type="text" name="ustensiles" id="ustensils" class="input-tag" placeholder="" />
+                            <i class="fa-thin fa-magnifying-glass"></i>
+                        </div>
+                        <ul id="ustensils-list" class="li-list"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="tags">
+                <div class="tag">
+                    <span class="tagName">Oeuf</span>
+                    <i class="fa-light fa-xmark"></i>
+                </div>
+                <div class="tag">
+                    <span class="tagName">Nouilles</span>
+                    <i class="fa-light fa-xmark"></i>
+                </div>
+                <div class="tag">
+                    <span class="tagName">Piment de Cayenne</span>
+                    <i class="fa-light fa-xmark"></i>
+                </div>
+            </div>
+            <div class="recipesContainer"></div>
+        </main>
+        <script src="./scripts/index.js" type="module"></script>
+    </body>
+</html>
