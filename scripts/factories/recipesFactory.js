@@ -1,37 +1,30 @@
 export function displayRecipes(data) {
     const recipesContainer = document.querySelector(".recipesContainer")
-    for (let i = 0; i < data.length; i++) {
-        console.log(data[i].id)
-        console.log(data[i].servings)
-        console.log(data[i].ingredients)
-        console.log(data[i].time)
-        console.log(data[i].description)
-        console.log(data[i].appliance)
-        console.log(data[i].ustensils)
-
+    data.forEach((recipe) => {
+        console.log(recipe.id)
+        console.log(recipe.servings)
+        console.log(recipe.appliance)
+        console.log(recipe.ustensils)
         const article = document.createElement("article")
         article.classList.add("recipeCard")
         const recipeImg = document.createElement("img")
         recipeImg.classList.add("recipeImg")
-        recipeImg.setAttribute("src", `../../assets/recipes/${data[i].image}`)
-
+        recipeImg.setAttribute("src", `../../assets/recipes/${recipe.image}`)
         const recipeDetails = document.createElement("div")
         recipeDetails.classList.add("recipeDetails")
 
         const recipeName = document.createElement("h2")
         recipeName.classList.add("recipeTitle")
-        recipeName.textContent = data[i].name
-
+        recipeName.textContent = recipe.name
         const recipeDetailsMain = document.createElement("div")
         recipeDetailsMain.classList.add("recipeDetails-main")
 
-        const recipeSubtitle = document.createElement("h3")
-        recipeSubtitle.textContent = "Recette"
+        const recipeSubTitle = document.createElement("h3")
+        recipeSubTitle.textContent = "Recette"
 
         const recipeDescription = document.createElement("p")
         recipeDescription.classList.add("recipeDescription")
-        recipeDescription.textContent = data[i].description
-
+        recipeDescription.textContent = recipe.description
         const recipeList = document.createElement("div")
         recipeList.classList.add("recipeList")
 
@@ -41,38 +34,43 @@ export function displayRecipes(data) {
         const recipeAllIngredients = document.createElement("div")
         recipeAllIngredients.classList.add("recipeAllIngredients")
 
-        data[i].ingredients.forEach((ingredients) => {
-            console.log(ingredients.ingredient)
-            console.log(ingredients.quantity)
-            console.log(ingredients.unit)
-
+        recipe.ingredients.forEach((ingredients) => {
             const recipeIngredient = document.createElement("div")
             recipeIngredient.classList.add("recipeIngredient")
             const recipeIngredientName = document.createElement("span")
             recipeIngredientName.classList.add("recipeIngredient-name")
             recipeIngredientName.textContent = ingredients.ingredient
-            const recipeIngredientQuantity = document.createElement("span")
-            recipeIngredientQuantity.classList.add("recipeIngredient-quantity")
-            recipeIngredientQuantity.textContent = ingredients.quantity
-            const recipeIngredientUnit = document.createElement("span")
-            recipeIngredientQuantity.classList.add("recipeIngredient-unit")
-            recipeIngredientUnit.textContent = ingredients.unit
+
             const recipeIngredientQuantityUnit = document.createElement("div")
             recipeIngredientQuantityUnit.classList.add("recipeIngredientQuantityUnit")
+            const recipeIngredientQuantity = document.createElement("span")
+            recipeIngredientQuantity.classList.add("recipeIngredient-quantity")
+            const recipeIngredientUnit = document.createElement("span")
+            recipeIngredientUnit.classList.add("recipeIngredient-unit")
+            if (ingredients.quantity == undefined && ingredients.unit == undefined) {
+                recipeIngredientQuantity.textContent = ` `
+                recipeIngredientUnit.textContent = ` `
+            }
+            if (ingredients.quantity !== undefined && ingredients.unit == undefined) {
+                recipeIngredientQuantity.textContent = `${ingredients.quantity} `
+                recipeIngredientUnit.textContent = ` `
+            }
+            if (ingredients.unit !== undefined && ingredients.quantity !== undefined) {
+                recipeIngredientQuantity.textContent = `${ingredients.quantity} `
+                recipeIngredientUnit.textContent = ingredients.unit
+            }
 
             recipeIngredient.appendChild(recipeIngredientName)
             recipeIngredient.appendChild(recipeIngredientQuantityUnit)
             recipeIngredientQuantityUnit.appendChild(recipeIngredientQuantity)
             recipeIngredientQuantityUnit.appendChild(recipeIngredientUnit)
-
             recipeAllIngredients.appendChild(recipeIngredient)
         })
-
         const recipeTime = document.createElement("span")
         recipeTime.classList.add("recipeTime")
-        recipeTime.textContent = `${data[i].time}min`
+        recipeTime.textContent = `${recipe.time}min`
 
-        recipeDetailsMain.appendChild(recipeSubtitle)
+        recipeDetailsMain.appendChild(recipeSubTitle)
         recipeDetailsMain.appendChild(recipeDescription)
         recipeDetails.appendChild(recipeName)
         recipeDetails.appendChild(recipeDetailsMain)
@@ -83,5 +81,5 @@ export function displayRecipes(data) {
         article.appendChild(recipeDetails)
         article.appendChild(recipeTime)
         recipesContainer.appendChild(article)
-    }
+    })
 }
