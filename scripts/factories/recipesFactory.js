@@ -1,10 +1,6 @@
 export function displayRecipes(data) {
     const recipesContainer = document.querySelector(".recipesContainer")
     data.forEach((recipe) => {
-        /*   console.log(recipe.id)
-        console.log(recipe.servings)
-        console.log(recipe.appliance)
-        console.log(recipe.ustensils) */
         const article = document.createElement("article")
         article.classList.add("recipeCard")
         const recipeImg = document.createElement("img")
@@ -82,8 +78,4 @@ export function displayRecipes(data) {
         article.appendChild(recipeTime)
         recipesContainer.appendChild(article)
     })
-    /*    for (let i = 0; i < data.length; i++) {
-        const element = data[i]
-        console.log(element.name)
-    } */
 }

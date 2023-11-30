@@ -19,7 +19,6 @@ export function searchRecipes(recipes) {
         }
         for (let i = 0; i < ustensils.length; i++) {
             const ustensil = ustensils[i].toUpperCase()
-            console.log(ustensil)
 
             if (regexQuery.test(ustensil)) {
                 recipesFiltered.push(recipes[i])
