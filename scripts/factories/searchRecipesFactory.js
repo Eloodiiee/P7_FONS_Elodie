@@ -27,5 +27,6 @@ export function searchRecipes(recipes) {
         }
     }
     recipesFiltered = recipesFiltered.filter((item, index) => recipesFiltered.indexOf(item) === index)
+    inputSearchBar.value = ""
     return recipesFiltered
 }
