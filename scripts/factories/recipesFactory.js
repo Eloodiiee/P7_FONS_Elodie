@@ -5,7 +5,7 @@ export function displayRecipes(data) {
         article.classList.add("recipeCard")
         const recipeImg = document.createElement("img")
         recipeImg.classList.add("recipeImg")
-        recipeImg.setAttribute("src", `../../assets/recipes/${recipe.image}`)
+        recipeImg.setAttribute("src", `assets/recipes/${recipe.image}`)
         const recipeDetails = document.createElement("div")
         recipeDetails.classList.add("recipeDetails")
 
