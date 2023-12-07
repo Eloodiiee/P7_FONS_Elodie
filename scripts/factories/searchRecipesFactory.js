@@ -1,8 +1,6 @@
 export function searchRecipes(recipes, recipeRequest, regexQuery) {
     let recipesFiltered = []
     for (let i = 0; i < recipes.length; i++) {
-        let ustensils = recipes[i].ustensils
-        let ingredients = recipes[i].ingredients
         if (recipeRequest == "" || regexQuery.test(recipes[i].name.toUpperCase()) || regexQuery.test(recipes[i].appliance.toUpperCase())) {
             recipesFiltered.push(recipes[i])
         }

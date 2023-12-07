@@ -142,13 +142,18 @@ main {
     height: 30px;
     border: 1px solid #7a7a7a;
 }
-.li-list {
+
+.filterSearchList {
     display: none;
     opacity: 0; /* Menu déroulant des filtres avancés */
+}
+.li-list {
     border-radius: 10px;
     list-style: none;
     padding: 0;
     margin: 0 0 1em 0;
+    height: 150px;
+    overflow-y: scroll;
 }
 
 .open {
@@ -174,9 +179,23 @@ main {
     font-size: 14px;
 }
 
-.li-list > {
+.li-list > * {
     font-size: 14px;
     padding: 0;
+}
+.numberOfRecipes_Container {
+    display: flex;
+    height: clamp(2.5625rem, 2.2799rem + 1.413vw, 3.375rem);
+    margin-right: 1.5svw;
+    align-items: end;
+    margin-left: auto;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+.number_of_recipes {
+    font-family: "Anton", sans-serif;
+    font-weight: 400;
+    font-size: 21px;
 }
 .tags {
     /* Affichage des tags */
