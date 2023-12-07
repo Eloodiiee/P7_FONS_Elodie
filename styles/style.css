@@ -148,11 +148,10 @@ main {
     opacity: 0; /* Menu déroulant des filtres avancés */
 }
 .li-list {
-    border-radius: 10px;
     list-style: none;
     padding: 0;
     margin: 0 0 1em 0;
-    height: 150px;
+    height: 200px;
     overflow-y: scroll;
 }
 
@@ -181,7 +180,12 @@ main {
 
 .li-list > * {
     font-size: 14px;
-    padding: 0;
+    line-height: 19px;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+.li-list > *:hover {
+    background-color: #ffd15b;
 }
 .numberOfRecipes_Container {
     display: flex;
