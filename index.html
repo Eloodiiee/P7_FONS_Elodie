@@ -90,22 +90,14 @@
                     <i class="fa-light fa-xmark"></i>
                 </div>
             </div>
-            <div class="recipesContainer" data-recipe-cards-container></div>
-            <template data-recipe-template>
+            <div class="recipesContainer" data-cards-container></div>
+            <template data-template>
                 <article class="recipeCard">
                     <img src="" alt="" class="recipeImg" data-img />
                     <div class="recipeDetails">
                         <h2 class="recipeTitle" data-name></h2>
-                        <div class="recipeDetails-main">
-                            <h3>Recette</h3>
-                            <p class="recipeDescription" data-description></p>
-                        </div>
-                        <div class="recipeList">
-                            <h3>Ingrédients</h3>
-                            <div class="recipeAllIngredients" data-all-ingredients></div>
-                        </div>
-                    </div>
-                    <span class="recipeTime" data-time></span>
+                        <div class="recipeDetails-main" data-details-container></div>
+                    <span class="recipeTime" data-chip></span>
                 </article>
             </template>
         </main>

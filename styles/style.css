@@ -227,7 +227,7 @@ main {
     display: flex;
     flex-wrap: wrap;
     gap: 80px;
-    margin-top: 20px;
+    margin-top: 55px;
 }
 
 .recipeCard {

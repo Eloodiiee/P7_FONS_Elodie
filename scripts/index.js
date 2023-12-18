@@ -1,16 +1,35 @@
 import { recipes } from "../data/recipes.js"
+import { displayCards } from "./factories/cardFactory.js"
 import { displayRecipes } from "./factories/recipesFactory.js"
 import { searchRecipes } from "./factories/searchRecipesFactory.js"
 import { searchByIngredient } from "./factories/searchRecipesFactory.js"
 import { searchByAppliance } from "./factories/searchRecipesFactory.js"
 import { searchByUstensil } from "./factories/searchRecipesFactory.js"
 
-displayRecipes(recipes)
+let card = []
+let allCards = []
+let recipesJSON = []
+/*displayRecipes(recipes)*/
 let recipesFiltered = []
 let recipesRequest = ""
 const inputSearchBar = document.querySelector("#inputSearchBar")
 const recipesContainer = document.querySelector(".recipesContainer")
 const numberOfRecipe = document.querySelector(".number_of_recipes")
+
+recipesJSON = JSON.stringify(recipes)
+recipesJSON = JSON.parse(recipesJSON)
+
+function fillContainer(recipesToBeDisplayed) {
+    recipesContainer.innerHTML = ""
+    recipesToBeDisplayed.forEach((recipe) => {
+        card = displayCards(recipe)
+        allCards.splice(0, 0, card)
+        displayRecipes(card)
+    })
+    allCards.reverse()
+    console.log(allCards)
+}
+fillContainer(recipesJSON)
 
 inputSearchBar.addEventListener("input", (e) => {
     recipesRequest = e.target.value
