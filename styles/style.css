@@ -297,5 +297,6 @@ main {
     color: #000;
     background-color: #ffd15b;
     border-radius: 30px;
-    padding: 10px;
+    padding-block: 10px;
+    padding-inline: 20px;
 }

@@ -1,6 +1,6 @@
 import { recipes } from "../data/recipes.js"
 import { displayCards } from "./factories/cardFactory.js"
-import { displayRecipes } from "./factories/recipesFactory.js"
+import { displayRecipes } from "./factories/cardFactory.js"
 import { searchRecipes } from "./factories/searchRecipesFactory.js"
 import { searchByIngredient } from "./factories/searchRecipesFactory.js"
 import { searchByAppliance } from "./factories/searchRecipesFactory.js"
@@ -9,7 +9,6 @@ import { searchByUstensil } from "./factories/searchRecipesFactory.js"
 let card = []
 let allCards = []
 let recipesJSON = []
-/*displayRecipes(recipes)*/
 let recipesFiltered = []
 let recipesRequest = ""
 const inputSearchBar = document.querySelector("#inputSearchBar")
