@@ -6,8 +6,9 @@ export function displayCards(data) {
     const cardName = card.querySelector("[data-name]")
     const cardDetailsContainer = card.querySelector("[data-details-container]")
     const cardChip = card.querySelector("[data-chip]")
-    cardsContainer.appendChild(card)
-    return {
+    let oneCard = {}
+
+    return (oneCard = {
         element: card,
         img: cardImg,
         title: cardName,
@@ -20,7 +21,7 @@ export function displayCards(data) {
         ingredients: data.ingredients,
         ustensils: data.ustensils,
         appliance: data.appliance,
-    }
+    })
 }
 export function displayRecipes(data) {
     data.img.src = `../../assets/recipes/${data.image}`
@@ -64,7 +65,7 @@ export function displayRecipes(data) {
             recipeIngredientUnit.textContent = " "
         }
         if (ingredients.unit !== undefined && ingredients.quantity !== undefined) {
-            recipeIngredientQuantity.textContent = `${ingredients.quantity}`
+            recipeIngredientQuantity.textContent = `${ingredients.quantity} `
             recipeIngredientUnit.textContent = ingredients.unit
         }
 
