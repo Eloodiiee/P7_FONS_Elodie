@@ -6,11 +6,6 @@ import { searchByAppliance } from "./utils/searchByFilter.js"
 import { searchByUstensil } from "./utils/searchByFilter.js"
 import { searchRecipes } from "./utils/searchRecipes.js"
 
-/*
-import { searchByIngredient } from "./factories/searchRecipesFactory.js"
-import { searchByAppliance } from "./factories/searchRecipesFactory.js"
-import { searchByUstensil } from "./factories/searchRecipesFactory.js" */
-
 let card = []
 let allCards = []
 let recipesJSON = []
