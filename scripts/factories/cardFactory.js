@@ -1,42 +1,31 @@
 export function displayCards(data) {
-    const cardsContainer = document.querySelector("[data-cards-container]")
-    const cardTemplate = document.querySelector("[data-template]")
-    const card = cardTemplate.content.cloneNode(true).children[0]
-    const cardImg = card.querySelector("[data-img]")
-    const cardName = card.querySelector("[data-name]")
-    const cardDetailsContainer = card.querySelector("[data-details-container]")
-    const cardChip = card.querySelector("[data-chip]")
-    let oneCard = {}
+    const card = document.createElement("article")
+    card.classList.add("recipeCard")
+    const recipeDetailMain = document.createElement("div")
+    recipeDetailMain.classList.add("recipeDetails-main")
 
-    return (oneCard = {
-        element: card,
-        img: cardImg,
-        title: cardName,
-        detailsContainer: cardDetailsContainer,
-        chip: cardChip,
-        image: data.image,
-        name: data.name,
-        time: data.time,
-        description: data.description,
-        ingredients: data.ingredients,
-        ustensils: data.ustensils,
-        appliance: data.appliance,
-    })
-}
-export function displayRecipes(data) {
-    data.img.src = `../../assets/recipes/${data.image}`
-    data.title.textContent = data.name
-    data.chip.textContent = `${data.time}min`
+    const cardImg = document.createElement("img")
+    cardImg.src = `../../assets/recipes/${data.image}`
+    cardImg.classList.add("recipeImg")
+    const cardName = document.createElement("h2")
+    cardName.textContent = data.name
+    cardName.classList.add("recipeTitle")
+    const cardChip = document.createElement("span")
+    cardChip.textContent = `${data.time}min`
+    cardChip.classList.add("recipeTime")
+
     const recipeSubTitle = document.createElement("h3")
     recipeSubTitle.textContent = "Recette"
-    data.detailsContainer.appendChild(recipeSubTitle)
+    const cardDetailsContainer = document.createElement("div")
+    cardDetailsContainer.appendChild(recipeSubTitle)
+    cardDetailsContainer.classList.add("recipeDetails")
     const recipeDescription = document.createElement("p")
     recipeDescription.classList.add("recipeDescription")
     recipeDescription.textContent = data.description
-    data.detailsContainer.appendChild(recipeDescription)
+    cardDetailsContainer.appendChild(recipeDescription)
     const recipeList = document.createElement("div")
     recipeList.classList.add("recipeList")
-    data.detailsContainer.appendChild(recipeList)
+    cardDetailsContainer.appendChild(recipeList)
     const recipeIngredientsSubTitle = document.createElement("h3")
     recipeIngredientsSubTitle.textContent = "Ingrédients"
     recipeList.appendChild(recipeIngredientsSubTitle)
@@ -75,4 +64,10 @@ export function displayRecipes(data) {
         recipeIngredientQuantityUnit.appendChild(recipeIngredientUnit)
         recipeAllIngredients.appendChild(recipeIngredient)
     })
+    card.appendChild(cardImg)
+    card.appendChild(cardDetailsContainer)
+    cardDetailsContainer.appendChild(cardName)
+    cardName.appendChild(recipeDetailMain)
+    card.appendChild(cardChip)
+    return card
 }

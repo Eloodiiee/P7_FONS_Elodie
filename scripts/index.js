@@ -1,6 +1,5 @@
 import { recipes } from "../data/recipes.js"
 import { displayCards } from "./factories/cardFactory.js"
-import { displayRecipes } from "./factories/cardFactory.js"
 import { searchByIngredient } from "./utils/searchByFilter.js"
 import { searchByAppliance } from "./utils/searchByFilter.js"
 import { searchByUstensil } from "./utils/searchByFilter.js"
@@ -22,9 +21,8 @@ function fillContainer(recipesToBeDisplayed) {
     recipesContainer.innerHTML = ""
     recipesToBeDisplayed.forEach((recipe) => {
         card = displayCards(recipe)
-        recipesContainer.appendChild(card.element)
+        recipesContainer.appendChild(card)
         allCards.splice(0, 0, card)
-        displayRecipes(card)
     })
     allCards.reverse()
     console.log(allCards)
