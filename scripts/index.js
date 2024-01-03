@@ -37,7 +37,8 @@ fillContainer(recipesJSON)
 inputSearchBar.addEventListener("input", (e) => {
     recipeRequest = e.target.value.toLowerCase()
     if (inputSearchBar.value.length > 2) {
-        searchBy(recipeRequest, searchRecipes)
+        recipesFiltered = searchBy(recipeRequest, searchRecipes)
+        console.log(recipesFiltered)
     }
     if (inputSearchBar.value.length == 0) {
         searchBy(recipeRequest, searchRecipes)
@@ -45,7 +46,6 @@ inputSearchBar.addEventListener("input", (e) => {
 })
 function searchBy(recipeRequest, functionSearch) {
     recipesFiltered = functionSearch(recipeRequest, recipesJSON)
-    recipesFiltered.reverse()
     allCards = []
     fillContainer(recipesFiltered)
 }
