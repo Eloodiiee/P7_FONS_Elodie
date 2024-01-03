@@ -4,15 +4,18 @@ import { searchByIngredient } from "./utils/searchByFilter.js"
 import { searchByAppliance } from "./utils/searchByFilter.js"
 import { searchByUstensil } from "./utils/searchByFilter.js"
 import { searchRecipes } from "./utils/searchRecipes.js"
+import { createTag } from "./utils/createTag.js"
 
 let card = []
 let allCards = []
 let recipesJSON = []
 let recipesFiltered = []
 let recipeRequest = ""
+let nbOfRecipe = 0
 const inputSearchBar = document.querySelector("#inputSearchBar")
 const recipesContainer = document.querySelector(".recipesContainer")
-const numberOfRecipe = document.querySelector(".number_of_recipes")
+const numberOfRecipes = document.querySelector(".number_of_recipes")
+const tagsContainer = document.querySelector(".tags")
 
 recipesJSON = JSON.stringify(recipes)
 recipesJSON = JSON.parse(recipesJSON)
@@ -26,12 +29,19 @@ function fillContainer(recipesToBeDisplayed) {
     })
     allCards.reverse()
     console.log(allCards)
+    nbOfRecipe = allCards.length
+    displayNumberOfRecipe(nbOfRecipe)
 }
 fillContainer(recipesJSON)
 
 inputSearchBar.addEventListener("input", (e) => {
     recipeRequest = e.target.value.toLowerCase()
-    searchBy(recipeRequest, searchRecipes)
+    if (inputSearchBar.value.length > 2) {
+        searchBy(recipeRequest, searchRecipes)
+    }
+    if (inputSearchBar.value.length == 0) {
+        searchBy(recipeRequest, searchRecipes)
+    }
 })
 function searchBy(recipeRequest, functionSearch) {
     recipesFiltered = functionSearch(recipeRequest, recipesJSON)
@@ -39,6 +49,31 @@ function searchBy(recipeRequest, functionSearch) {
     allCards = []
     fillContainer(recipesFiltered)
 }
+
+function displayNumberOfRecipe(nbOfRecipe) {
+    if (nbOfRecipe == 50) {
+        numberOfRecipes.textContent = `${nbOfRecipe + 1450} recettes`
+    } else if (nbOfRecipe == 1) {
+        numberOfRecipes.textContent = `${nbOfRecipe} recette`
+    } else if (nbOfRecipe == 0) {
+        numberOfRecipes.textContent = "Aucune recette"
+    } else {
+        numberOfRecipes.textContent = `${nbOfRecipe} recettes`
+    }
+}
+
+function closeTag() {
+    if (tagsContainer.childNodes.length > 0) {
+        tagsContainer.childNodes.forEach((tag) => {
+            const tagCloseBtn = tag.lastChild
+            tagCloseBtn.addEventListener("click", () => {
+                searchBy("", searchRecipes)
+                tag.remove()
+            })
+        })
+    }
+}
+
 const advancedFilters = document.querySelectorAll(".advancedFilter")
 
 advancedFilters.forEach((advancedFilter) => {
@@ -67,6 +102,13 @@ advancedFilters.forEach((advancedFilter) => {
                         const li = document.createElement("li")
                         li.textContent = ingredient
                         liListIng.appendChild(li)
+                        li.addEventListener("click", (e) => {
+                            recipeRequest = e.target.innerText.toLowerCase()
+                            createTag(recipeRequest)
+                            searchBy(recipeRequest, searchByIngredient)
+                            inputTag.value = ""
+                            closeTag()
+                        })
                     }
                     inputTag.addEventListener("input", (e) => {
                         recipeRequest = e.target.value.toLowerCase()
@@ -86,6 +128,13 @@ advancedFilters.forEach((advancedFilter) => {
                         const li = document.createElement("li")
                         li.textContent = appliance
                         liListApp.appendChild(li)
+                        li.addEventListener("click", (e) => {
+                            recipeRequest = e.target.innerText.toLowerCase()
+                            createTag(recipeRequest)
+                            searchBy(recipeRequest, searchByAppliance)
+                            inputTag.value = ""
+                            closeTag()
+                        })
                     }
                     inputTag.addEventListener("input", (e) => {
                         recipeRequest = e.target.value.toLowerCase()
@@ -109,6 +158,13 @@ advancedFilters.forEach((advancedFilter) => {
                         const li = document.createElement("li")
                         li.textContent = ustensil
                         liListUst.appendChild(li)
+                        li.addEventListener("click", (e) => {
+                            recipeRequest = e.target.innerText.toLowerCase()
+                            createTag(recipeRequest)
+                            searchBy(recipeRequest, searchByUstensil)
+                            inputTag.value = ""
+                            closeTag()
+                        })
                     }
                     inputTag.addEventListener("input", (e) => {
                         recipeRequest = e.target.value.toLowerCase()

@@ -186,6 +186,7 @@ main {
 }
 .li-list > *:hover {
     background-color: #ffd15b;
+    cursor: pointer;
 }
 .numberOfRecipes_Container {
     display: flex;
@@ -202,9 +203,7 @@ main {
     font-size: 21px;
 }
 .tags {
-    /* Affichage des tags */
-    display: none;
-    /* display: flex; */
+    display: flex;
     gap: 30px;
     margin: 20px 0px 10px 0px;
 }

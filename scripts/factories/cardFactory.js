@@ -78,6 +78,5 @@ export function displayCards(data) {
 
     cardDetailsContainer.appendChild(recipeDetailMain)
     card.appendChild(cardChip)
-    console.log(card)
     return card
 }
