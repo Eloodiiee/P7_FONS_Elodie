@@ -80,98 +80,35 @@ advancedFilters.forEach((advancedFilter) => {
     const chevron = advancedFilter.querySelector(".fa-chevron-down")
     const filterList = advancedFilter.querySelector(".filterSearchList")
     const inputTags = advancedFilter.querySelectorAll(".input-tag")
+    const liLists = advancedFilter.querySelectorAll(".li-list")
     advancedFilter.children[0].addEventListener("click", () => {
         chevron.classList.toggle("rotate")
         filterList.classList.toggle("open")
         inputTags.forEach((inputTag) => {
-            switch (inputTag.id) {
-                case (inputTag.id = "ingredients"):
-                    let allIngredients = []
-                    let ingredientsList = []
-                    const liListIng = document.querySelector("#ingredients-list")
-                    for (let i = 0; i < recipes.length; i++) {
-                        let ingredients = recipes[i].ingredients
-                        for (let ingredientsIndex = 0; ingredientsIndex < ingredients.length; ingredientsIndex++) {
-                            const ingredient = ingredients[ingredientsIndex].ingredient
-                            allIngredients.push(ingredient)
-                        }
-                    }
-                    ingredientsList = [...new Set(allIngredients)]
-                    for (let i = 0; i < ingredientsList.length; i++) {
-                        const ingredient = ingredientsList[i]
-                        const li = document.createElement("li")
-                        li.textContent = ingredient
-                        liListIng.appendChild(li)
-                        li.addEventListener("click", (e) => {
-                            recipeRequest = e.target.innerText.toLowerCase()
-                            createTag(recipeRequest)
-                            searchBy(recipeRequest, searchByIngredient)
-                            inputTag.value = ""
-                            closeTag()
-                        })
-                    }
-                    inputTag.addEventListener("input", (e) => {
-                        recipeRequest = e.target.value.toLowerCase()
-                        searchBy(recipeRequest, searchByIngredient)
-                    })
-                    break
-                case (inputTag.id = "appliances"):
-                    let allAppliances = []
-                    let appliancesList = []
-                    const liListApp = document.querySelector("#appliances-list")
-                    for (let i = 0; i < recipes.length; i++) {
-                        allAppliances.push(recipes[i].appliance)
-                    }
-                    appliancesList = [...new Set(allAppliances)]
-                    for (let i = 0; i < appliancesList.length; i++) {
-                        const appliance = appliancesList[i]
-                        const li = document.createElement("li")
-                        li.textContent = appliance
-                        liListApp.appendChild(li)
-                        li.addEventListener("click", (e) => {
-                            recipeRequest = e.target.innerText.toLowerCase()
-                            createTag(recipeRequest)
-                            searchBy(recipeRequest, searchByAppliance)
-                            inputTag.value = ""
-                            closeTag()
-                        })
-                    }
-                    inputTag.addEventListener("input", (e) => {
-                        recipeRequest = e.target.value.toLowerCase()
-                        searchBy(recipeRequest, searchByAppliance)
-                    })
-                    break
-                case (inputTag.id = "ustensils"):
-                    let allUstensils = []
-                    let ustensilsList = []
-                    const liListUst = document.querySelector("#ustensils-list")
-                    for (let i = 0; i < recipes.length; i++) {
-                        let ustensils = recipes[i].ustensils
-                        for (let ustensilsIndex = 0; ustensilsIndex < ustensils.length; ustensilsIndex++) {
-                            const ustensil = ustensils[ustensilsIndex]
-                            allUstensils.push(ustensil)
-                        }
-                    }
-                    ustensilsList = [...new Set(allUstensils)]
-                    for (let i = 0; i < ustensilsList.length; i++) {
-                        const ustensil = ustensilsList[i]
-                        const li = document.createElement("li")
-                        li.textContent = ustensil
-                        liListUst.appendChild(li)
-                        li.addEventListener("click", (e) => {
-                            recipeRequest = e.target.innerText.toLowerCase()
-                            createTag(recipeRequest)
-                            searchBy(recipeRequest, searchByUstensil)
-                            inputTag.value = ""
-                            closeTag()
-                        })
-                    }
-                    inputTag.addEventListener("input", (e) => {
-                        recipeRequest = e.target.value.toLowerCase()
-                        searchBy(recipeRequest, searchByUstensil)
-                    })
-                    break
+            let filterList = []
+            if (inputTag.id == "ingredients") {
+                recipesJSON.filter((recipe) => recipe.ingredients.forEach((ing) => filterList.push(ing.ingredient)))
             }
+            if (inputTag.id == "appliances") {
+                recipesJSON.filter((recipe) => filterList.push(recipe.appliance))
+            }
+            if (inputTag.id == "ustensils") {
+                recipesJSON.filter((recipe) => recipe.ustensils.forEach((ust) => filterList.push(ust)))
+            }
+            filterList = [...new Set(filterList)]
+            liLists.forEach((liList) => {
+                filterList.forEach((filter) => {
+                    const li = document.createElement("li")
+                    li.textContent = filter
+                    liList.appendChild(li)
+                    li.addEventListener("click", (e) => {
+                        recipeRequest = e.target.innerText.toLowerCase()
+                        createTag(recipeRequest)
+                        searchBy(recipeRequest, searchRecipes)
+                        closeTag()
+                    })
+                })
+            })
         })
     })
 })
