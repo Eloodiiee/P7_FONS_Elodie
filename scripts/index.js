@@ -37,8 +37,7 @@ fillContainer(recipesJSON)
 inputSearchBar.addEventListener("input", (e) => {
     recipeRequest = e.target.value.toLowerCase()
     if (inputSearchBar.value.length > 2) {
-        recipesFiltered = searchRecipes(recipeRequest, recipesJSON)
-        console.log(recipesFiltered) //searchBy(recipeRequest, searchRecipes)
+        searchBy(recipeRequest, searchRecipes)
     }
     if (inputSearchBar.value.length == 0) {
         searchBy(recipeRequest, searchRecipes)
