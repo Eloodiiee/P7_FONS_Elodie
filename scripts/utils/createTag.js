@@ -1,13 +1,16 @@
+import { createElementWithClass } from "./createHTMLElement.js"
+
 export function createTag(recipeRequest) {
     const tagsContainer = document.querySelector(".tags")
-    const tag = document.createElement("div")
-    tag.classList.add("tag")
-    const tagName = document.createElement("span")
-    tagName.classList.add("tagName")
-    tagName.textContent = recipeRequest
-    const closeBtn = document.createElement("i")
-    closeBtn.classList.add("fa-solid")
-    closeBtn.classList.add("fa-xmark")
+    if (!tagsContainer) {
+        console.error("Tags container not found")
+        return
+    }
+
+    const tag = createElementWithClass("div", "tag")
+    const tagName = createElementWithClass("span", "tagName", recipeRequest)
+    const closeBtn = createElementWithClass("i", "fa-solid fa-xmark")
+
     tag.appendChild(tagName)
     tag.appendChild(closeBtn)
     tagsContainer.appendChild(tag)
