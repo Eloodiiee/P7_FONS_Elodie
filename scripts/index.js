@@ -1,18 +1,21 @@
 import { recipes } from "../data/recipes.js"
 import { displayCards } from "./factories/cardFactory.js"
 import { searchRecipes } from "./utils/searchRecipes.js"
-import { searchByIngredient, searchByAppliance, searchByUstensil } from "./utils/searchByFilter.js"
+import { searchByFilter, searchByIngredient, searchByAppliance, searchByUstensil } from "./utils/searchByFilter.js"
+import { createTag } from "./utils/createTag.js"
 
 let card = [] // Initialisation de la variable qui stocke les donnés de chaque carte recette une par une.
 let allCards = [] // Initialisation de la variable qui récupère toutes les cartes de recettes.
 let nbOfRecipe = 0 // Variable qui permet de stocker le nombre de recettes pour pouvoir l'afficher.
 let recipesFiltered = [] // Permet de stocker les recettes filtrés.
 let recipeRequest = "" // Requête de recherche des recettes.
+let tag
 
 const recipesContainer = document.querySelector(".recipesContainer") // Je sélectionne le container des recettes.
 const numberOfRecipes = document.querySelector(".number_of_recipes") // Je sélectionne le span du nombre de recettes.
 const inputSearchBar = document.querySelector("#inputSearchBar") // Je sélectionne la barre de recherche principale.
 const advancedFilters = document.querySelectorAll(".advancedFilter") // Je sélectionne les filtres avancés pour les menus dropdown.
+const tagsContainer = document.querySelector(".tags") //
 
 /** Function fillContainer qui permet d'afficher toutes les cartes de recette, **/
 /** au chargement de la page et en fonction du résultat de la recherche. **/
@@ -41,14 +44,15 @@ function displayNumberOfRecipe(nbOfRecipe) {
     }
 }
 
-/** La function searchBy prend deux paramètres : recipeRequest qui une chaîne de caractères représentant la requête de recherche, **/
-/** et la functionSearch qui est une function variable qui s'adapte en fonction de celle donnée dans les paramètres. **/
+/** La function searchBy prend trois paramètres : recipeRequest qui une chaîne de caractères représentant la requête de recherche, **/
+/** la functionSearch qui est une function variable qui s'adapte en fonction de celle donnée dans les paramètres, **/
+/** et le paramètre "filter" qui est optionnel et qui correspond à une fonction de recherche spécifique (searchByIngredient, searchByAppliance, searchByUstensil) **/
 /** Appel de la functionSearch en lui passant recipeRequest et les recettes. **/
 /** Le résultat de cette recherche est stocké dans recipesFiltered. **/
 /** Réinitialise allCards pour nettoyer la liste des cartes. **/
 /** Appelle la fonction fillContainer en lui passant les recettes filtrées. **/
-function searchBy(recipeRequest, functionSearch) {
-    recipesFiltered = functionSearch(recipeRequest, recipes)
+function searchBy(recipeRequest, functionSearch, filter = "") {
+    recipesFiltered = functionSearch(recipeRequest, recipes, filter)
     allCards = []
     fillContainer(recipesFiltered)
 }
@@ -133,7 +137,57 @@ function updateFilterList(advancedFilter) {
                 const li = document.createElement("li")
                 li.textContent = filter
                 liList.appendChild(li)
+                li.addEventListener("click", (e) => {
+                    recipeRequest = e.target.innerText.toLowerCase()
+                    tagHandler(recipeRequest, inputTag.id)
+                })
             })
         })
     })
+}
+
+// Fonction tagHandler permet de differencier les tags par catégorie pour faire la recherche approprié.
+function tagHandler(recipeRequest, filterID) {
+    tag = createTag(recipeRequest)
+    tagsContainer.appendChild(tag)
+    if (filterID === "ingredients") {
+        searchWithTag(searchByIngredient)
+    } else if (filterID === "appliances") {
+        searchWithTag(searchByAppliance)
+    } else if (filterID === "ustensils") {
+        searchWithTag(searchByUstensil)
+    }
+    closeTag()
+}
+// Fonction de recherche avec tags.
+function searchWithTag(filterFunction) {
+    recipeRequest = tag.children[0].innerText.toLowerCase()
+    searchBy(recipeRequest, searchByFilter, filterFunction)
+}
+
+function closeTag() {
+    const allCloseBtns = tagsContainer.querySelectorAll(".fa-xmark")
+    // Supprime les EventListener existant.
+    allCloseBtns.forEach((closeBtn) => {
+        closeBtn.removeEventListener("click", handleTagClose)
+    })
+
+    // Ajoute des nouveaux Eventlistener.
+    allCloseBtns.forEach((closeBtn) => {
+        closeBtn.addEventListener("click", handleTagClose)
+    })
+}
+
+// Gestionnaire de l'événement de fermeture de tag.
+function handleTagClose(e) {
+    const tagElement = e.target.closest(".tag")
+    if (tagElement) {
+        tagsContainer.removeChild(tagElement)
+        updateRecipesDisplay() // Appel de la function de mise à jour de l'affichage des recettes.
+    }
+}
+// Mise à jour de l'affichage des recettes.
+function updateRecipesDisplay() {
+    recipeRequest = ""
+    searchBy(recipeRequest, searchRecipes)
 }

@@ -11,28 +11,28 @@ export function displayCards(data) {
     /** Je crée le conteneur pour les détails de la recette. **/
     const cardDetailsContainer = createElementWithClass("div", "recipeDetails")
     /** Je crée et définit le titre de la recette. **/
-    const cardName = createElementWithClass("h2", "recipeTitle", data.name)
+    const cardName = createElementWithClass("h2", "recipeTitle", "", data.name)
     /** Je crée et définit le temps de préparation de la recette. **/
-    const cardChip = createElementWithClass("span", "recipeTime", `${data.time}min`)
+    const cardChip = createElementWithClass("span", "recipeTime", "", `${data.time}min`)
 
     /** Je crée le conteneur principal pour les détails de la recette. **/
     const recipeDetailMain = createElementWithClass("div", "recipeDetails-main")
     /** Je crée un sous-titre pour la section des détails de la recette. **/
-    const recipeSubTitle = createElementWithClass("h3", "", "Recette")
+    const recipeSubTitle = createElementWithClass("h3", "", "", "Recette")
     /** Je crée et définit la description de la recette. **/
-    const recipeDescription = createElementWithClass("p", "recipeDescription", data.description)
+    const recipeDescription = createElementWithClass("p", "recipeDescription", "", data.description)
 
     /** Je crée le conteneur pour la liste des ingrédients. **/
     const recipeList = createElementWithClass("div", "recipeList")
     /** Je crée un sous-titre pour la liste des ingrédients. **/
-    const recipeIngredientsSubTitle = createElementWithClass("h3", "", "Ingrédients")
+    const recipeIngredientsSubTitle = createElementWithClass("h3", "", "", "Ingrédients")
     /** Je crée le conteneur pour tous les ingrédients. **/
     const recipeAllIngredients = createElementWithClass("div", "recipeAllIngredients")
 
     /** Je parcours chaque ingrédient de la recette et crée les éléments correspondants. **/
     data.ingredients.forEach((ingredients) => {
         const recipeIngredient = createElementWithClass("div", "recipeIngredient")
-        const recipeIngredientName = createElementWithClass("span", "recipeIngredient-name", ingredients.ingredient)
+        const recipeIngredientName = createElementWithClass("span", "recipeIngredient-name", "", ingredients.ingredient)
 
         /** Je gère l'affichage des quantités et unités des ingrédients. **/
         const quantity = ingredients.quantity ?? ""
