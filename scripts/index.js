@@ -105,7 +105,7 @@ function updateFilterList(advancedFilter) {
         })
     }
 
-    /** Je parcours les "inputTags". **/
+    /** Je parcours les "inputTags" cest ma barre de recherche. **/
     /** Je vérifie l'ID des "inputTags" et exécute la logique correspondante. **/
     inputTags.forEach((inputTag) => {
         let filterList = []
@@ -128,6 +128,9 @@ function updateFilterList(advancedFilter) {
         /** Je parcours les Listes des filtres et j'ajoute les éléments des filtres. **/
         /** Je crée un élément "li" pour chaque éléments de la liste des filtres et les ajoute à la liste. **/
         liLists.forEach((liList) => {
+            if (liList.children.length > 0) {
+                liList.textContent = ""
+            }
             filterList.forEach((filter) => {
                 const li = document.createElement("li")
                 li.textContent = filter
@@ -141,7 +144,7 @@ function updateFilterList(advancedFilter) {
     })
 }
 
-// Fonction tagHandler permet de differencier les tags par catégorie pour faire la recherche approprié.
+// Fonction tagHandler permet de differencier les tags par catégorie pour faire la recherche appropriée.
 function tagHandler(recipeRequest, filterID) {
     tag = createTag(recipeRequest)
     tagsContainer.appendChild(tag)
@@ -155,11 +158,13 @@ function tagHandler(recipeRequest, filterID) {
     closeTag()
 }
 // Fonction de recherche avec tags.
+// filterFunction est déclaré plus haut dans searchBy (filter)
 function searchWithTag(filterFunction) {
     recipeRequest = tag.children[0].innerText.toLowerCase()
     searchBy(recipeRequest, searchByFilter, filterFunction)
 }
 
+//Pour eviter que le foreach creer des bugs de suppression jai creer un removeEventListener
 function closeTag() {
     const allCloseBtns = tagsContainer.querySelectorAll(".fa-xmark")
     // Supprime les EventListener existant.
