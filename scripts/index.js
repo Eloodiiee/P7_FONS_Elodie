@@ -9,13 +9,13 @@ let allCards = [] // Initialisation de la variable qui récupère toutes les car
 let nbOfRecipe = 0 // Variable qui permet de stocker le nombre de recettes pour pouvoir l'afficher.
 let recipesFiltered = [] // Permet de stocker les recettes filtrés.
 let recipeRequest = "" // Requête de recherche des recettes.
-let tag
+let tag // Variable qui correspond au tag créé par la function createTag
 
 const recipesContainer = document.querySelector(".recipesContainer") // Je sélectionne le container des recettes.
 const numberOfRecipes = document.querySelector(".number_of_recipes") // Je sélectionne le span du nombre de recettes.
 const inputSearchBar = document.querySelector("#inputSearchBar") // Je sélectionne la barre de recherche principale.
 const advancedFilters = document.querySelectorAll(".advancedFilter") // Je sélectionne les filtres avancés pour les menus dropdown.
-const tagsContainer = document.querySelector(".tags") //
+const tagsContainer = document.querySelector(".tags") // Je selectionne le container des tags.
 
 /** Function fillContainer qui permet d'afficher toutes les cartes de recette, **/
 /** au chargement de la page et en fonction du résultat de la recherche. **/
@@ -36,12 +36,7 @@ fillContainer(recipes)
 /** Function displayNumberOfRecipe qui permet d'afficher le nombre de recettes en temps réel **/
 /** Cette function se base sur le nombre de recettes de recipes.js **/
 function displayNumberOfRecipe(nbOfRecipe) {
-    numberOfRecipes.textContent = `${nbOfRecipe} recettes`
-    if (nbOfRecipe == 1) {
-        numberOfRecipes.textContent = "1 recette"
-    } else if (nbOfRecipe == 0) {
-        numberOfRecipes.textContent = "Aucune recette"
-    }
+    numberOfRecipes.textContent = nbOfRecipe + (nbOfRecipe <= 1 ? " recette" : " recettes")
 }
 
 /** La function searchBy prend trois paramètres : recipeRequest qui une chaîne de caractères représentant la requête de recherche, **/

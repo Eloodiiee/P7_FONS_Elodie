@@ -3,6 +3,7 @@ export function createElementWithClass(type, className, secondClassName, textCon
     /** Je crée un élément HTML du type spécifié. **/
     const element = document.createElement(type)
     /** J'ajoute une classe à l'élément si un nom de classe est fourni. **/
+    /** Les croix des tags fonctionnent avec deux classes fa-solid et fa-xmark donc besoin de creation de deux classes differentes **/
     if (className) {
         element.classList.add(className)
         if (secondClassName != "") {
