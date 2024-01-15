@@ -9,13 +9,97 @@ let allCards = [] // Initialisation de la variable qui récupère toutes les car
 let nbOfRecipe = 0 // Variable qui permet de stocker le nombre de recettes pour pouvoir l'afficher.
 let recipesFiltered = [] // Permet de stocker les recettes filtrés.
 let recipeRequest = "" // Requête de recherche des recettes.
-let tag // Variable qui correspond au tag créé par la function createTag
+let recipesWithFilter = [] // Permet de stocker les recettes filtrés comportant des filtres additionnels.
 
 const recipesContainer = document.querySelector(".recipesContainer") // Je sélectionne le container des recettes.
 const numberOfRecipes = document.querySelector(".number_of_recipes") // Je sélectionne le span du nombre de recettes.
 const inputSearchBar = document.querySelector("#inputSearchBar") // Je sélectionne la barre de recherche principale.
 const advancedFilters = document.querySelectorAll(".advancedFilter") // Je sélectionne les filtres avancés pour les menus dropdown.
 const tagsContainer = document.querySelector(".tags") // Je selectionne le container des tags.
+
+//////////////////////////////////////////////////////////////// Tags jaune remis au debut de mon code et réécrit  ////////////////////////////////////////////////////////////////////////////////////////
+let tagResults = {}
+
+function tagHandler(recipeRequest, filterID) {
+    const tag = createTag(recipeRequest)
+    tagsContainer.appendChild(tag)
+
+    tag.dataset.tagKey = recipeRequest + "_" + filterID // Assigne une clé unique au tag
+
+    const searchFunctions = {
+        ingredients: searchByIngredient,
+        appliances: searchByAppliance,
+        ustensils: searchByUstensil,
+    }
+
+    const searchWithTagFunction = searchFunctions[filterID]
+    if (searchWithTagFunction) {
+        searchWithTag(tag, searchWithTagFunction)
+    }
+
+    closeTag()
+}
+
+function searchWithTag(tag, filterFunction) {
+    const recipeRequest = tag.children[0].innerText.toLowerCase()
+    if (recipesFiltered == "") {
+        recipesFiltered = recipes
+    }
+    const tagKey = tag.dataset.tagKey // utilise une clé unique pour le référencement dans tagResults
+    tagResults[tagKey] = advancedSearch(recipeRequest, recipesFiltered, filterFunction)
+    console.log(tagResults[tagKey])
+    updateRecipesDisplay()
+}
+
+function updateRecipesDisplay() {
+    // Combine ici les résultats de tous les tags actifs et met à jour l'affichage
+    let combinedResults = combineTagResults()
+    fillContainer(combinedResults)
+    if (combinedResults.length === 0) {
+        recipeRequest = ""
+        searchBy(recipeRequest, searchRecipes)
+        return
+    }
+}
+
+function combineTagResults() {
+    // Combine les résultats de recherche de tous les tags ici
+    let combined = []
+    for (let tag in tagResults) {
+        combined = combined.concat(tagResults[tag])
+    }
+    // Elimine les doublons si nécessaire
+    return unique(combined)
+}
+
+function unique(array) {
+    // Cette fonction élimine les doublons dans un tableau
+    return [...new Set(array)]
+}
+
+function handleTagClose(e) {
+    const tagElement = e.target.closest(".tag")
+    if (tagElement) {
+        const tagKey = tagElement.dataset.tagKey // utilise une clé unique pour le référencement dans tagResults
+        tagsContainer.removeChild(tagElement)
+        delete tagResults[tagKey] // Supprime le bon tag de tagResults
+        updateRecipesDisplay() // Met à jour l'affichage des recettes
+    }
+}
+function closeTag() {
+    const allCloseBtns = tagsContainer.querySelectorAll(".fa-xmark")
+    // Supprime les EventListener existants
+    allCloseBtns.forEach((closeBtn) => {
+        closeBtn.removeEventListener("click", handleTagClose)
+    })
+
+    // Ajoute des nouveaux EventListener
+    allCloseBtns.forEach((closeBtn) => {
+        closeBtn.addEventListener("click", handleTagClose)
+    })
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /** Function fillContainer qui permet d'afficher toutes les cartes de recette, **/
 /** au chargement de la page et en fonction du résultat de la recherche. **/
@@ -39,24 +123,30 @@ function displayNumberOfRecipe(nbOfRecipe) {
     numberOfRecipes.textContent = nbOfRecipe + (nbOfRecipe <= 1 ? " recette" : " recettes")
 }
 
-/** La function searchBy prend trois paramètres : recipeRequest qui une chaîne de caractères représentant la requête de recherche, **/
-/** la functionSearch qui est une function variable qui s'adapte en fonction de celle donnée dans les paramètres, **/
-/** et le paramètre "filter" qui est optionnel et qui correspond à une fonction de recherche spécifique (searchByIngredient, searchByAppliance, searchByUstensil) **/
+/** La function searchBy prend deux paramètres : recipeRequest qui est une chaîne de caractères représentant le champ de recherche, **/
+/** et la functionSearch qui est une function variable qui s'adapte en fonction de celle donnée dans les paramètres. **/
 /** Appel de la functionSearch en lui passant recipeRequest et les recettes. **/
 /** Le résultat de cette recherche est stocké dans recipesFiltered. **/
 /** Réinitialise allCards pour nettoyer la liste des cartes. **/
 /** Appelle la fonction fillContainer en lui passant les recettes filtrées. **/
-function searchBy(recipeRequest, functionSearch, filter = "") {
-    recipesFiltered = functionSearch(recipeRequest, recipes, filter)
+function searchBy(recipeRequest) {
+    recipesFiltered = searchRecipes(recipeRequest, recipes)
     allCards = []
     fillContainer(recipesFiltered)
+}
+//////////////////////////////////////////////////////////////// searchBy permet de faire la recherche et  advancedSearch permet d'affiner la recherche //////////////////////////////////////////////////////////
+function advancedSearch(recipeRequest, recipesFiltered, filterFunction) {
+    recipesWithFilter = searchByFilter(recipeRequest, recipesFiltered, filterFunction)
+    allCards = []
+    fillContainer(recipesWithFilter)
+    return recipesWithFilter
 }
 
 /** Effectue la recherche si la longueur de la chaîne est supérieure à 2 ou si l'utilisateur appuie sur Backspace. **/
 inputSearchBar.addEventListener("input", (e) => {
     recipeRequest = e.target.value.toLowerCase()
     if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
-        searchBy(recipeRequest, searchRecipes)
+        searchBy(recipeRequest)
     }
 })
 
@@ -101,11 +191,11 @@ function updateFilterList(advancedFilter) {
     const addInputEventListener = (inputTag, filterFunction) => {
         inputTag.addEventListener("input", (e) => {
             recipeRequest = e.target.value.toLowerCase()
-            searchBy(recipeRequest, searchByFilter, filterFunction)
+            advancedSearch(recipeRequest, recipesFiltered, filterFunction)
         })
     }
 
-    /** Je parcours les "inputTags" cest ma barre de recherche. **/
+    /** Je parcours les "inputTags". **/
     /** Je vérifie l'ID des "inputTags" et exécute la logique correspondante. **/
     inputTags.forEach((inputTag) => {
         let filterList = []
@@ -113,7 +203,10 @@ function updateFilterList(advancedFilter) {
             /** Je crée une liste de filtres pour les ingrédients, les appareils et les ustensiles . **/
             /** Ajoutez d'un eventListener pour la recherche d'ingrédients, d'appareils, d'ustensiles. **/
             filterList = createFilterList(recipes, (recipe) => recipe.ingredients.map((ing) => ing.ingredient))
-            addInputEventListener(inputTag, searchByIngredient)
+            inputTag.addEventListener("input", (e) => {
+                recipeRequest = e.target.value.toLowerCase()
+                addInputEventListener(inputTag, searchByIngredient)
+            })
         } else if (inputTag.id === "appliances") {
             filterList = createFilterList(recipes, (recipe) => recipe.appliance)
             addInputEventListener(inputTag, searchByAppliance)
@@ -142,52 +235,4 @@ function updateFilterList(advancedFilter) {
             })
         })
     })
-}
-
-// Fonction tagHandler permet de differencier les tags par catégorie pour faire la recherche appropriée.
-function tagHandler(recipeRequest, filterID) {
-    tag = createTag(recipeRequest)
-    tagsContainer.appendChild(tag)
-    if (filterID === "ingredients") {
-        searchWithTag(searchByIngredient)
-    } else if (filterID === "appliances") {
-        searchWithTag(searchByAppliance)
-    } else if (filterID === "ustensils") {
-        searchWithTag(searchByUstensil)
-    }
-    closeTag()
-}
-// Fonction de recherche avec tags.
-// filterFunction est déclaré plus haut dans searchBy (filter)
-function searchWithTag(filterFunction) {
-    recipeRequest = tag.children[0].innerText.toLowerCase()
-    searchBy(recipeRequest, searchByFilter, filterFunction)
-}
-
-//Pour eviter que le foreach creer des bugs de suppression jai creer un removeEventListener
-function closeTag() {
-    const allCloseBtns = tagsContainer.querySelectorAll(".fa-xmark")
-    // Supprime les EventListener existant.
-    allCloseBtns.forEach((closeBtn) => {
-        closeBtn.removeEventListener("click", handleTagClose)
-    })
-
-    // Ajoute des nouveaux Eventlistener.
-    allCloseBtns.forEach((closeBtn) => {
-        closeBtn.addEventListener("click", handleTagClose)
-    })
-}
-
-// Gestionnaire de l'événement de fermeture de tag.
-function handleTagClose(e) {
-    const tagElement = e.target.closest(".tag")
-    if (tagElement) {
-        tagsContainer.removeChild(tagElement)
-        updateRecipesDisplay() // Appel de la function de mise à jour de l'affichage des recettes.
-    }
-}
-// Mise à jour de l'affichage des recettes.
-function updateRecipesDisplay() {
-    recipeRequest = ""
-    searchBy(recipeRequest, searchRecipes)
 }
