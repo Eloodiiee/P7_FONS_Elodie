@@ -105,6 +105,7 @@ function closeTag() {
 /** au chargement de la page et en fonction du résultat de la recherche. **/
 function fillContainer(recipesToBeDisplayed) {
     recipesContainer.innerHTML = ""
+    allCards = []
     recipesToBeDisplayed.forEach((recipe) => {
         card = displayCards(recipe)
         recipesContainer.appendChild(card)
@@ -131,13 +132,11 @@ function displayNumberOfRecipe(nbOfRecipe) {
 /** Appelle la fonction fillContainer en lui passant les recettes filtrées. **/
 function searchBy(recipeRequest) {
     recipesFiltered = searchRecipes(recipeRequest, recipes)
-    allCards = []
     fillContainer(recipesFiltered)
 }
 //////////////////////////////////////////////////////////////// searchBy permet de faire la recherche et  advancedSearch permet d'affiner la recherche //////////////////////////////////////////////////////////
 function advancedSearch(recipeRequest, recipesFiltered, filterFunction) {
     recipesWithFilter = searchByFilter(recipeRequest, recipesFiltered, filterFunction)
-    allCards = []
     fillContainer(recipesWithFilter)
     return recipesWithFilter
 }
