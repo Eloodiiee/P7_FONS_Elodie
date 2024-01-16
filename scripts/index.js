@@ -18,13 +18,18 @@ const advancedFilters = document.querySelectorAll(".advancedFilter") // Je séle
 const tagsContainer = document.querySelector(".tags") // Je selectionne le container des tags.
 
 //////////////////////////////////////////////////////////////// Tags jaune remis au debut de mon code et réécrit  ////////////////////////////////////////////////////////////////////////////////////////
-let tagResults = {}
+let tagResults = {} // C'est un tableau d'objet qui va regrouper les recettes correspondantes a tout les tags.
 
+/** La fonction "tagHandler" permet de pouvoir effectuer une recherche à partir des tags sélectionnés (tags jaunes).  **/
+/** Chaque tag a une clé unique qui permet de les différencier les uns des autres. **/
+/** La const "searchFunctions" regroupe les fonctions de recherche avancées **/
+/** La fonction de recherche par tag s'exécute après que la gestion des tags ait été effectué. **/
+/** La fonction de fermeture des tags est appelée pour pouvoir les fermer. **/
 function tagHandler(recipeRequest, filterID) {
     const tag = createTag(recipeRequest)
     tagsContainer.appendChild(tag)
 
-    tag.dataset.tagKey = recipeRequest + "_" + filterID // Assigne une clé unique au tag
+    tag.dataset.tagKey = recipeRequest + "_" + filterID
 
     const searchFunctions = {
         ingredients: searchByIngredient,
@@ -40,8 +45,12 @@ function tagHandler(recipeRequest, filterID) {
     closeTag()
 }
 
+/** La fonction "searchWithTag" exécute "advancedSearch" pour affiner les recherches déjà effectué dans la barre de recherche principale  **/
+/** S'il n 'y a pas eu de recherche principale effectuée alors, la recherche s'exécute avec l'ensemble des recettes de la base de données. **/
+/** Une fois la recherche effectuée les résultats sont compilés dans "tagResults". **/
+/** Puis la fonction "updateRecipesDisplay" est exécutée. **/
 function searchWithTag(tag, filterFunction) {
-    const recipeRequest = tag.children[0].innerText.toLowerCase()
+    recipeRequest = tag.children[0].innerText.toLowerCase()
     if (recipesFiltered == "") {
         recipesFiltered = recipes
     }
@@ -51,8 +60,9 @@ function searchWithTag(tag, filterFunction) {
     updateRecipesDisplay()
 }
 
+/** La fontcion "updateRecipesDisplay" récupère les résultats de tous les tags actifs et met à jour l'affichage. **/
+/** S'il n'y a plus de tag, l'affichage se met à jour en affichant toutes les recettes (comme à l'ouverture de ma page). **/
 function updateRecipesDisplay() {
-    // Combine ici les résultats de tous les tags actifs et met à jour l'affichage
     let combinedResults = combineTagResults()
     fillContainer(combinedResults)
     if (combinedResults.length === 0) {
@@ -62,38 +72,41 @@ function updateRecipesDisplay() {
     }
 }
 
+/** La fonction "combineTagResults" combine les résultats de recherche de tous les tags,  **/
+/** et appelle la fonction qui retire les doublons. **/
 function combineTagResults() {
-    // Combine les résultats de recherche de tous les tags ici
     let combined = []
     for (let tag in tagResults) {
         combined = combined.concat(tagResults[tag])
     }
-    // Elimine les doublons si nécessaire
     return unique(combined)
 }
 
+/** La fonction "unique" élimine les doublons dans un tableau. **/
 function unique(array) {
-    // Cette fonction élimine les doublons dans un tableau
     return [...new Set(array)]
 }
 
+/** La fonction "handleTagClose" permet de gérer la fermeture des tags. **/
+/** Elle supprime le bon tag de tagResults que l'utilisateur aura retiré. **/
+/** Puis met à jour l'affichage des recettes. **/
 function handleTagClose(e) {
     const tagElement = e.target.closest(".tag")
     if (tagElement) {
         const tagKey = tagElement.dataset.tagKey // utilise une clé unique pour le référencement dans tagResults
         tagsContainer.removeChild(tagElement)
-        delete tagResults[tagKey] // Supprime le bon tag de tagResults
-        updateRecipesDisplay() // Met à jour l'affichage des recettes
+        delete tagResults[tagKey]
+        updateRecipesDisplay()
     }
 }
+
+/** La fonction "closeTag" supprime  et remet à zéro les EventListener existants, **/
+/** et les remplace par des nouveaux EventListener pour éviter qu'il y ait plusieurs EventListener par tag. **/
 function closeTag() {
     const allCloseBtns = tagsContainer.querySelectorAll(".fa-xmark")
-    // Supprime les EventListener existants
     allCloseBtns.forEach((closeBtn) => {
         closeBtn.removeEventListener("click", handleTagClose)
     })
-
-    // Ajoute des nouveaux EventListener
     allCloseBtns.forEach((closeBtn) => {
         closeBtn.addEventListener("click", handleTagClose)
     })
@@ -173,65 +186,56 @@ function toggleFilter(advancedFilter) {
     updateFilterList(advancedFilter)
 }
 
-/** La fonction updateFilterList sert à mettre à jour la liste de filtres. **/
+/** La fonction "updateFilterList" sert à mettre à jour la liste de filtres. **/
 /** Je sélectionne tous les éléments avec la classe ".input-tag" et ".li-list" dans "advancedFilter". **/
 function updateFilterList(advancedFilter) {
     const inputTags = advancedFilter.querySelectorAll(".input-tag")
     const liLists = advancedFilter.querySelectorAll(".li-list")
 
-    /** La Fonction createFilterList sert à créer une liste de filtres à partir des recettes. **/
-    /** J'utilise "map" et "flat" pour transformer et aplatir l'array de recettes. **/
+    /** La fonction fléchée "createFilterList" sert à créer la liste de suggestion des filtres avancés. **/
     const createFilterList = (recipes, filterFunc) => {
         return recipes.map(filterFunc).flat()
     }
 
-    /** La Fonction addInputEventListener a pour but d'ajouter un eventListener aux "input" des filtres avancés. **/
-    /** Lorsqu'on saisit des données, les résultats de recherche sont mis à jour. **/
-    const addInputEventListener = (inputTag, filterFunction) => {
-        inputTag.addEventListener("input", (e) => {
-            recipeRequest = e.target.value.toLowerCase()
-            advancedSearch(recipeRequest, recipesFiltered, filterFunction)
-        })
-    }
+    /** La boucle forEach "inputTags" permet de déterminer la fonction de tri des suggestion des filtres avancés. **/
 
-    /** Je parcours les "inputTags". **/
-    /** Je vérifie l'ID des "inputTags" et exécute la logique correspondante. **/
     inputTags.forEach((inputTag) => {
-        let filterList = []
-        if (inputTag.id === "ingredients") {
-            /** Je crée une liste de filtres pour les ingrédients, les appareils et les ustensiles . **/
-            /** Ajoutez d'un eventListener pour la recherche d'ingrédients, d'appareils, d'ustensiles. **/
-            filterList = createFilterList(recipes, (recipe) => recipe.ingredients.map((ing) => ing.ingredient))
-            inputTag.addEventListener("input", (e) => {
-                recipeRequest = e.target.value.toLowerCase()
-                addInputEventListener(inputTag, searchByIngredient)
-            })
-        } else if (inputTag.id === "appliances") {
-            filterList = createFilterList(recipes, (recipe) => recipe.appliance)
-            addInputEventListener(inputTag, searchByAppliance)
-        } else if (inputTag.id === "ustensils") {
-            filterList = createFilterList(recipes, (recipe) => recipe.ustensils)
-            addInputEventListener(inputTag, searchByUstensil)
+        let filterFunc = ""
+        switch (inputTag.id) {
+            case "ingredients":
+                filterFunc = (recipe) => recipe.ingredients.map((ing) => ing.ingredient)
+                break
+            case "appliances":
+                filterFunc = (recipe) => recipe.appliance
+                break
+            case "ustensils":
+                filterFunc = (recipe) => recipe.ustensils
+                break
         }
 
-        /** J'enlève les doublons de la liste des filtres. **/
-        filterList = [...new Set(filterList)]
+        /** Une fois la liste de suggestion créée les dupliqués sont supprimés. **/
+        /** L'EventListener "inputTag" permet de récupérer ce qui a été écrit dans le champ du filtre et appelle la fonction de mise à jour la liste de suggestion. **/
+        const filterList = [...new Set(createFilterList(recipes, filterFunc))]
+        inputTag.addEventListener("input", (e) => {
+            recipeRequest = e.target.value.toLowerCase()
+            const filteredList = filterList.filter((item) => item.toLowerCase().includes(recipeRequest))
+            updateLiList(filteredList, liLists[0], inputTag)
+        })
 
-        /** Je parcours les Listes des filtres et j'ajoute les éléments des filtres. **/
-        /** Je crée un élément "li" pour chaque éléments de la liste des filtres et les ajoute à la liste. **/
-        liLists.forEach((liList) => {
-            if (liList.children.length > 0) {
-                liList.textContent = ""
-            }
-            filterList.forEach((filter) => {
-                const li = document.createElement("li")
-                li.textContent = filter
-                liList.appendChild(li)
-                li.addEventListener("click", (e) => {
-                    recipeRequest = e.target.innerText.toLowerCase()
-                    tagHandler(recipeRequest, inputTag.id)
-                })
-            })
+        updateLiList(filterList, liLists[0], inputTag) // Initialise avec la liste complète
+    })
+}
+
+/** La fonction "updateLiList" permet de mettre à jour la liste des suggestion en fonction de ce qui est ecrit dans le champ du filtre. **/
+function updateLiList(filterList, liList, inputTag) {
+    liList.innerHTML = "" // Nettoie les suggestions précédentes
+    filterList.forEach((filter) => {
+        const li = document.createElement("li")
+        li.textContent = filter
+        liList.appendChild(li)
+        li.addEventListener("click", () => {
+            inputTag.value = filter // Met à jour la valeur de l'input avec la suggestion sélectionnée.
+            tagHandler(filter, inputTag.id) // Gére la sélection
         })
     })
 }
