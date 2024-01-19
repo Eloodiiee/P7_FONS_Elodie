@@ -31,23 +31,38 @@ let tagResults = {} // C'est un tableau d'objet qui va regrouper les recettes co
 /** La fonction de recherche par tag s'exécute après que la gestion des tags ait été effectué. **/
 /** La fonction de fermeture des tags est appelée pour pouvoir les fermer. **/
 function tagHandler(recipeRequest, filterID) {
-    const tag = createTag(recipeRequest)
-    tagsContainer.appendChild(tag)
+    const lowerCaseRequest = recipeRequest.toLowerCase()
 
-    tag.dataset.tagKey = recipeRequest + "_" + filterID
+    const existingTag = [...tagsContainer.children].some((tag) => {
+        /** Permet de s'assurer que l'utilisateur ne peux pas ajouter deux fois le même tag. **/
+        /** S'assure que tagKey est défini **/
+        if (!tag.dataset.tagKey) {
+            return false
+        }
 
-    const searchFunctions = {
-        ingredients: searchByIngredient,
-        appliances: searchByAppliance,
-        ustensils: searchByUstensil,
+        const tagKeyParts = tag.dataset.tagKey.split("_")
+        const tagText = tag.children[0].innerText.toLowerCase()
+        return tagText === lowerCaseRequest && tagKeyParts[1] === filterID
+    })
+    /** Après avoir vérifié que le tag n'est pas un doublon, exécute le code du tag normalement. **/
+    if (!existingTag) {
+        const tag = createTag(recipeRequest)
+        tagsContainer.appendChild(tag)
+        tag.dataset.tagKey = lowerCaseRequest + "_" + filterID
+
+        const searchFunctions = {
+            ingredients: searchByIngredient,
+            appliances: searchByAppliance,
+            ustensils: searchByUstensil,
+        }
+
+        const searchWithTagFunction = searchFunctions[filterID]
+        if (searchWithTagFunction) {
+            searchWithTag(tag, searchWithTagFunction)
+        }
+
+        closeTag()
     }
-
-    const searchWithTagFunction = searchFunctions[filterID]
-    if (searchWithTagFunction) {
-        searchWithTag(tag, searchWithTagFunction)
-    }
-
-    closeTag()
 }
 
 /** La fonction "searchWithTag" exécute "advancedSearch" pour affiner les recherches déjà effectué dans la barre de recherche principale  **/
