@@ -33,8 +33,8 @@ let tagResults = {} // C'est un tableau d'objet qui va regrouper les recettes co
 function tagHandler(recipeRequest, filterID) {
     const lowerCaseRequest = recipeRequest.toLowerCase()
 
+    /** Permet de s'assurer que l'utilisateur ne peux pas ajouter deux fois le même tag. **/
     const existingTag = [...tagsContainer.children].some((tag) => {
-        /** Permet de s'assurer que l'utilisateur ne peux pas ajouter deux fois le même tag. **/
         /** S'assure que tagKey est défini **/
         if (!tag.dataset.tagKey) {
             return false
