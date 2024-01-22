@@ -1,5 +1,4 @@
-///// Recherche par nom, description et ingrédient comme demandé sur le projet. ////
-
+import { removeAccents } from "./removeAccent.js"
 /** La fonction "searchRecipes" a pour but de rechercher des recettes en fonction de plusieurs critères. **/
 export function searchRecipes(recipeRequest, allRecipes) {
     /** Je vérifie si "recipeRequest" est vide ou inexistant. **/
@@ -11,10 +10,11 @@ export function searchRecipes(recipeRequest, allRecipes) {
     /** Pour chaque recette dans allRecipes, effectue les vérifications suivantes : **/
     return allRecipes.filter(
         (recipe) =>
-            /** Vérifie par nom, description et ingrédient les recettes correspondantes et les retourne. **/
-            recipe.name.toLowerCase().includes(recipeRequest) ||
-            recipe.description.toLowerCase().includes(recipeRequest) ||
-            recipe.ingredients.some((ing) => ing.ingredient.toLowerCase().includes(recipeRequest))
+            /** Vérifie par nom, ingrédient, appareil, ustensile les recettes correspondantes   **/
+            /** Vérifie si au moins un ingrédient,appareil,ustensile correspond et les retourne.  **/
+            removeAccents(recipe.name).toLowerCase().includes(recipeRequest) ||
+            removeAccents(recipe.description).toLowerCase().includes(recipeRequest) ||
+            recipe.ingredients.some((ing) => removeAccents(ing.ingredient).toLowerCase().includes(recipeRequest))
     )
 }
 /**  **/

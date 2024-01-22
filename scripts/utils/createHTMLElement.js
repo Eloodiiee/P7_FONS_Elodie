@@ -6,7 +6,7 @@ export function createElementWithClass(type, className, secondClassName, textCon
     /** Les croix des tags fonctionnent avec deux classes fa-solid et fa-xmark donc besoin de creation de deux classes differentes **/
     if (className) {
         element.classList.add(className)
-        if (secondClassName != "") {
+        if (secondClassName != "" && secondClassName) {
             element.classList.add(secondClassName)
         }
     }

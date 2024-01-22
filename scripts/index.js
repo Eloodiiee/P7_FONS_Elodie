@@ -3,18 +3,18 @@ import { displayCards } from "./factories/cardFactory.js"
 import { searchRecipes } from "./utils/searchRecipes.js"
 import { searchByFilter, searchByIngredient, searchByAppliance, searchByUstensil } from "./utils/searchByFilter.js"
 import { createTag } from "./utils/createTag.js"
+import { removeAccents } from "./utils/removeAccent.js"
 
 let card = [] // Initialisation de la variable qui stocke les donnés de chaque carte recette une par une.
-let allCards = [] // Initialisation de la variable qui récupère toutes les cartes de recettes.
 let nbOfRecipe = 0 // Variable qui permet de stocker le nombre de recettes pour pouvoir l'afficher.
 let recipesFiltered = [] // Permet de stocker les recettes filtrés.
 let recipeRequest = "" // Requête de recherche des recettes.
-let recipesWithFilter = [] // Permet de stocker les recettes filtrés comportant des filtres additionnels.
 let filterFunc = "" // Cette variable sert à stocker la fonction de filtrage des listes de filtres
 let filterList = [] // Variable qui stocke les listes de filtres
 let filterLowerCased = "" // Variable qui stocke les filtres en minuscule pour leur reformatage
-let combined = [] // Permet de stocker les résultats de recherche par tags combinés
-let combinedResults = [] // Permet de stocker les résultats de recherche par tags combinés après avoir retiré les doublons
+let selectedIngredientTags = []
+let selectedApplianceTags = []
+let selectedUstensilTags = []
 
 const recipesContainer = document.querySelector(".recipesContainer") // Je sélectionne le container des recettes.
 const numberOfRecipes = document.querySelector(".number_of_recipes") // Je sélectionne le span du nombre de recettes.
@@ -23,7 +23,55 @@ const advancedFilters = document.querySelectorAll(".advancedFilter") // Je séle
 const tagsContainer = document.querySelector(".tags") // Je selectionne le container des tags.
 
 //////////////////////////////////////////////////////////////// Tags jaune remis au debut de mon code et réécrit  ////////////////////////////////////////////////////////////////////////////////////////
-let tagResults = {} // C'est un tableau d'objet qui va regrouper les recettes correspondantes a tout les tags.
+
+function addTag(tag, category) {
+    switch (category) {
+        case "ingredients":
+            selectedIngredientTags.push(tag)
+            break
+        case "appliances":
+            selectedApplianceTags.push(tag)
+            break
+        case "ustensils":
+            selectedUstensilTags.push(tag)
+            break
+    }
+    // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
+    updateRecipesByTags(selectedIngredientTags, selectedApplianceTags, selectedUstensilTags)
+}
+
+function removeTag(tag, category) {
+    let index
+    switch (category) {
+        case "ingredients":
+            index = selectedIngredientTags.indexOf(tag)
+            if (index > -1) selectedIngredientTags.splice(index, 1)
+            break
+        case "appliances":
+            index = selectedApplianceTags.indexOf(tag)
+            if (index > -1) selectedApplianceTags.splice(index, 1)
+            break
+        case "ustensils":
+            index = selectedUstensilTags.indexOf(tag)
+            if (index > -1) selectedUstensilTags.splice(index, 1)
+            break
+    }
+    // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
+    updateRecipesByTags(selectedIngredientTags, selectedApplianceTags, selectedUstensilTags)
+}
+
+function updateRecipesByTags(selectedIngredientTags, selectedApplianceTags, selectedUstensilTags) {
+    if (recipesFiltered.length === 0) {
+        recipesFiltered = recipes
+    }
+    const filteredRecipes = recipesFiltered.filter(
+        (recipe) =>
+            (selectedIngredientTags.length === 0 || selectedIngredientTags.every((tag) => recipe.ingredients.some((ing) => removeAccents(ing.ingredient).toLowerCase().includes(tag.toLowerCase())))) &&
+            (selectedApplianceTags.length === 0 || selectedApplianceTags.every((tag) => removeAccents(recipe.appliance).toLowerCase().includes(tag.toLowerCase()))) &&
+            (selectedUstensilTags.length === 0 || selectedUstensilTags.every((tag) => recipe.ustensils.some((ustensil) => removeAccents(ustensil).toLowerCase().includes(tag.toLowerCase()))))
+    )
+    fillContainer(filteredRecipes)
+}
 
 /** La fonction "tagHandler" permet de pouvoir effectuer une recherche à partir des tags sélectionnés (tags jaunes).  **/
 /** Chaque tag a une clé unique qui permet de les différencier les uns des autres. **/
@@ -31,7 +79,7 @@ let tagResults = {} // C'est un tableau d'objet qui va regrouper les recettes co
 /** La fonction de recherche par tag s'exécute après que la gestion des tags ait été effectué. **/
 /** La fonction de fermeture des tags est appelée pour pouvoir les fermer. **/
 function tagHandler(recipeRequest, filterID) {
-    const lowerCaseRequest = recipeRequest.toLowerCase()
+    const lowerCaseRequest = removeAccents(recipeRequest.toLowerCase())
 
     /** Permet de s'assurer que l'utilisateur ne peux pas ajouter deux fois le même tag. **/
     const existingTag = [...tagsContainer.children].some((tag) => {
@@ -50,55 +98,9 @@ function tagHandler(recipeRequest, filterID) {
         tagsContainer.appendChild(tag)
         tag.dataset.tagKey = lowerCaseRequest + "_" + filterID
 
-        const searchFunctions = {
-            ingredients: searchByIngredient,
-            appliances: searchByAppliance,
-            ustensils: searchByUstensil,
-        }
-
-        const searchWithTagFunction = searchFunctions[filterID]
-        if (searchWithTagFunction) {
-            searchWithTag(tag, searchWithTagFunction)
-        }
-
+        addTag(lowerCaseRequest, filterID)
         closeTag()
     }
-}
-
-/** La fonction "searchWithTag" exécute "advancedSearch" pour affiner les recherches déjà effectué dans la barre de recherche principale  **/
-/** S'il n 'y a pas eu de recherche principale effectuée alors, la recherche s'exécute avec l'ensemble des recettes de la base de données. **/
-/** Une fois la recherche effectuée les résultats sont compilés dans "tagResults". **/
-/** Puis la fonction "updateRecipesDisplay" est exécutée. **/
-function searchWithTag(tag, filterFunction) {
-    recipeRequest = tag.children[0].innerText.toLowerCase()
-    if (recipesFiltered == "") {
-        recipesFiltered = recipes
-    }
-    const tagKey = tag.dataset.tagKey // utilise une clé unique pour le référencement dans tagResults
-    tagResults[tagKey] = advancedSearch(recipeRequest, recipesFiltered, filterFunction)
-    updateRecipesDisplay()
-}
-
-/** La fontcion "updateRecipesDisplay" récupère les résultats de tous les tags actifs et met à jour l'affichage. **/
-/** S'il n'y a plus de tag, l'affichage se met à jour en affichant toutes les recettes (comme à l'ouverture de ma page). **/
-function updateRecipesDisplay() {
-    combinedResults = combineTagResults()
-    fillContainer(combinedResults)
-}
-
-/** La fonction "combineTagResults" combine les résultats de recherche de tous les tags,  **/
-/** et appelle la fonction qui retire les doublons. **/
-function combineTagResults() {
-    combined = []
-    for (let tag in tagResults) {
-        combined = combined.concat(tagResults[tag])
-    }
-    return unique(combined)
-}
-
-/** La fonction "unique" élimine les doublons dans un tableau. **/
-function unique(array) {
-    return [...new Set(array)]
 }
 
 /** La fonction "handleTagClose" permet de gérer la fermeture des tags. **/
@@ -107,17 +109,19 @@ function unique(array) {
 function handleTagClose(e) {
     const tagElement = e.target.closest(".tag")
     if (tagElement) {
-        const tagKey = tagElement.dataset.tagKey // utilise une clé unique pour le référencement dans tagResults
+        const tagKey = tagElement.dataset.tagKey
+        const [tagText, category] = tagKey.split("_")
+
+        // Appel de removeTag
+        removeTag(tagText, category) // Assurez-vous que cette ligne est correcte
+
         tagsContainer.removeChild(tagElement)
-        delete tagResults[tagKey]
-        updateRecipesDisplay()
     }
-    if (tagsContainer.childNodes.length === 0) {
-        inputSearchBar.value = ""
-        recipeRequest = ""
-        searchBy(recipeRequest, searchRecipes)
-        return
-    }
+}
+
+/** La fonction "unique" élimine les doublons dans un tableau. **/
+function unique(array) {
+    return [...new Set(array)]
 }
 
 /** La fonction "closeTag" supprime  et remet à zéro les EventListener existants, **/
@@ -140,9 +144,9 @@ advancedFilters.forEach((advancedFilter) => {
     advancedFilter.children[0].addEventListener("click", () => {
         toggleFilter(advancedFilter)
     })
+
     updateFilterList(advancedFilter)
 })
-
 /** La Fonction toggleFilter sert a basculer l'affichage d'un filtre avancé. **/
 /** Je Sélectionne le chevron et le cadre de la liste dans advancedFilter. **
 /** Je fais Basculer avec la classe "rotate" sur le chevron pour l'animation. **/
@@ -192,11 +196,10 @@ function updateFilterList(advancedFilter) {
         /** L'EventListener "inputTag" permet de récupérer ce qui a été écrit dans le champ du filtre et appelle la fonction de mise à jour la liste de suggestion. **/
         const filterList = createFilterList(recipes, filterFunc)
         inputTag.addEventListener("input", (e) => {
-            recipeRequest = e.target.value.toLowerCase()
-            const filteredList = filterList.filter((item) => item.toLowerCase().includes(recipeRequest))
+            recipeRequest = removeAccents(e.target.value.toLowerCase())
+            const filteredList = filterList.filter((item) => removeAccents(item).toLowerCase().includes(recipeRequest))
             updateLiList(filteredList, liLists[0], inputTag)
         })
-        console.log("listes créées")
         updateLiList(filterList, liLists[0], inputTag) // Initialise avec la liste complète.
     })
 }
@@ -219,13 +222,12 @@ function updateLiList(filterList, liList, inputTag) {
 /** au chargement de la page et en fonction du résultat de la recherche. **/
 function fillContainer(recipesToBeDisplayed) {
     recipesContainer.innerHTML = ""
-    allCards = []
     recipesToBeDisplayed.forEach((recipe) => {
         card = displayCards(recipe)
         recipesContainer.appendChild(card)
-        allCards.splice(0, 0, card)
     })
-    nbOfRecipe = allCards.length
+    nbOfRecipe = recipesToBeDisplayed.length
+
     displayNumberOfRecipe(nbOfRecipe)
 }
 
@@ -249,15 +251,17 @@ function searchBy(recipeRequest) {
     fillContainer(recipesFiltered)
 }
 //////////////////////////////////////////////////////////////// searchBy permet de faire la recherche et  advancedSearch permet d'affiner la recherche //////////////////////////////////////////////////////////
-function advancedSearch(recipeRequest, recipesFiltered, filterFunction) {
+/** Rendu obsolète pour l'instant parce que la recherche par tag est effectuée dans updateRecipesByTags **/
+
+/* function advancedSearch(recipeRequest, recipesFiltered, filterFunction) {
     recipesWithFilter = searchByFilter(recipeRequest, recipesFiltered, filterFunction)
     fillContainer(recipesWithFilter)
     return recipesWithFilter
-}
+} */
 
 /** Effectue la recherche si la longueur de la chaîne est supérieure à 2 ou si l'utilisateur appuie sur Backspace. **/
 inputSearchBar.addEventListener("input", (e) => {
-    recipeRequest = e.target.value.toLowerCase()
+    recipeRequest = removeAccents(e.target.value.toLowerCase())
     if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
         searchBy(recipeRequest)
     }
