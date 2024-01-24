@@ -112,8 +112,8 @@ function handleTagClose(e) {
         const tagKey = tagElement.dataset.tagKey
         const [tagText, category] = tagKey.split("_")
 
-        // Appel de removeTag
-        removeTag(tagText, category) // Assurez-vous que cette ligne est correcte
+        // Appel de la fonction remove tag
+        removeTag(tagText, category)
 
         tagsContainer.removeChild(tagElement)
     }
