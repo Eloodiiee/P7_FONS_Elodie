@@ -66,9 +66,9 @@ function updateRecipesByTags(selectedIngredientTags, selectedApplianceTags, sele
     }
     const filteredRecipes = recipesFiltered.filter(
         (recipe) =>
-            (selectedIngredientTags.length === 0 || selectedIngredientTags.every((tag) => recipe.ingredients.some((ing) => removeAccents(ing.ingredient).toLowerCase().includes(tag.toLowerCase())))) &&
-            (selectedApplianceTags.length === 0 || selectedApplianceTags.every((tag) => removeAccents(recipe.appliance).toLowerCase().includes(tag.toLowerCase()))) &&
-            (selectedUstensilTags.length === 0 || selectedUstensilTags.every((tag) => recipe.ustensils.some((ustensil) => removeAccents(ustensil).toLowerCase().includes(tag.toLowerCase()))))
+            (selectedIngredientTags.length === 0 || searchByFilter(recipe, selectedIngredientTags, searchByIngredient)) &&
+            (selectedApplianceTags.length === 0 || searchByFilter(recipe, selectedApplianceTags, searchByAppliance)) &&
+            (selectedUstensilTags.length === 0 || searchByFilter(recipe, selectedUstensilTags, searchByUstensil))
     )
     fillContainer(filteredRecipes)
 }
@@ -250,14 +250,6 @@ function searchBy(recipeRequest) {
     recipesFiltered = searchRecipes(recipeRequest, recipes)
     fillContainer(recipesFiltered)
 }
-//////////////////////////////////////////////////////////////// searchBy permet de faire la recherche et  advancedSearch permet d'affiner la recherche //////////////////////////////////////////////////////////
-/** Rendu obsolète pour l'instant parce que la recherche par tag est effectuée dans updateRecipesByTags **/
-
-/* function advancedSearch(recipeRequest, recipesFiltered, filterFunction) {
-    recipesWithFilter = searchByFilter(recipeRequest, recipesFiltered, filterFunction)
-    fillContainer(recipesWithFilter)
-    return recipesWithFilter
-} */
 
 /** Effectue la recherche si la longueur de la chaîne est supérieure à 2 ou si l'utilisateur appuie sur Backspace. **/
 inputSearchBar.addEventListener("input", (e) => {

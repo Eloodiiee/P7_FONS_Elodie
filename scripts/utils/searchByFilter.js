@@ -1,32 +1,31 @@
-///// allRecipes remplacé par recipesFiltered ////
-
-/** La fonction "searchByFilter" filtre les recettes en fonction de quel filtre est utilisé. **/
-export function searchByFilter(recipeRequest, recipesFiltered, functionSearch) {
-    /** Je vérifie si "recipeRequest" est vide ou inexistant. Si c'est le cas, **/
-    if (!recipeRequest || !recipeRequest.length) {
-        /** Je retourne une copie de la liste des recettes filtrées. **/
-        return [...recipesFiltered]
+import { removeAccents } from "./removeAccent.js"
+// La fonction "searchByFilter" filtre les recettes en fonction de quel filtre est utilisé. /
+export function searchByFilter(recipe, selectedCategoryTags, functionSearch) {
+    // Je vérifie si "recipe" est vide ou inexistant. Si c'est le cas, /
+    if (!recipe) {
+        // Je retourne une copie complète de la liste de toutes les recettes. /
+        return [...selectedCategoryTags]
     }
 
-    /** Si "recipeRequest" n'est pas vide, la fonction "functionSearch" s'exécute **/
-    /** pour filtrer et retourner les recettes correspondantes. **/
-    return functionSearch(recipeRequest, recipesFiltered)
+    // Si "recipe" n'est pas vide, la fonction "functionSearch" s'exécute /
+    // pour filtrer et retourner les recettes correspondantes. /
+    return functionSearch(recipe, selectedCategoryTags)
 }
 
-/** La fonction "searchByIngredient" a pour but de rechercher des recettes par ingrédient. **/
-export function searchByIngredient(recipeRequest, recipesFiltered) {
-    /** Filtre "recipesFiltered" pour ne garder que les recettes dont les ingrédients correspondent à "recipeRequest". **/
-    return recipesFiltered.filter((recipe) => recipe.ingredients.find((ing) => ing.ingredient.toLowerCase().includes(recipeRequest)))
+// La fonction "searchByIngredient" a pour but de rechercher des recettes par ingrédient. /
+export function searchByIngredient(recipe, selectedIngredientTags) {
+    // Filtre "selectedIngredientTags" pour ne garder que les recettes dont les ingrédients correspondent à "recipe". /
+    return selectedIngredientTags.every((tag) => recipe.ingredients.some((ing) => removeAccents(ing.ingredient).toLowerCase().includes(tag.toLowerCase())))
 }
 
-/** La fonction "searchByAppliance" a pour but de rechercher des recettes par appareil. **/
-export function searchByAppliance(recipeRequest, recipesFiltered) {
-    /** Filtre "recipesFiltered" pour ne garder que les recettes dont l'appareil correspond à "recipeRequest". **/
-    return recipesFiltered.filter((recipe) => recipe.appliance.toLowerCase().includes(recipeRequest))
+// La fonction "searchByAppliance" a pour but de rechercher des recettes par appareil. /
+export function searchByAppliance(recipe, selectedApplianceTags) {
+    // Filtre "selectedApplianceTags" pour ne garder que les recettes dont l'appareil correspond à "recipe". /
+    return selectedApplianceTags.every((tag) => removeAccents(recipe.appliance).toLowerCase().includes(tag.toLowerCase()))
 }
 
-/** La fonction "searchByUstensil" a pour but de rechercher des recettes par ustensile. **/
-export function searchByUstensil(recipeRequest, recipesFiltered) {
-    /** Filtre "recipesFiltered" pour ne garder que les recettes dont les ustensiles correspondent à "recipeRequest". **/
-    return recipesFiltered.filter((recipe) => recipe.ustensils.find((ust) => ust.toLowerCase().includes(recipeRequest)))
+// La fonction "searchByUstensil" a pour but de rechercher des recettes par ustensile. /
+export function searchByUstensil(recipe, selectedUstensilTags) {
+    // Filtre "selectedUstensilTags" pour ne garder que les recettes dont les ustensiles correspondent à "recipe". /
+    return selectedUstensilTags.every((tag) => recipe.ustensils.some((ustensil) => removeAccents(ustensil).toLowerCase().includes(tag.toLowerCase())))
 }
