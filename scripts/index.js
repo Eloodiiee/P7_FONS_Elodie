@@ -222,10 +222,11 @@ function updateLiList(filterList, liList, inputTag) {
 /** au chargement de la page et en fonction du résultat de la recherche. **/
 function fillContainer(recipesToBeDisplayed) {
     recipesContainer.innerHTML = ""
-    recipesToBeDisplayed.forEach((recipe) => {
+    for (let i = 0; i < recipesToBeDisplayed.length; i++) {
+        const recipe = recipesToBeDisplayed[i]
         card = displayCards(recipe)
         recipesContainer.appendChild(card)
-    })
+    }
     nbOfRecipe = recipesToBeDisplayed.length
 
     displayNumberOfRecipe(nbOfRecipe)
