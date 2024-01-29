@@ -119,11 +119,6 @@ function handleTagClose(e) {
     }
 }
 
-/** La fonction "unique" élimine les doublons dans un tableau. **/
-function unique(array) {
-    return [...new Set(array)]
-}
-
 /** La fonction "closeTag" supprime  et remet à zéro les EventListener existants, **/
 /** et les remplace par des nouveaux EventListener pour éviter qu'il y ait plusieurs EventListener par tag. **/
 function closeTag() {
@@ -169,7 +164,7 @@ function createFilterList(recipes, filterFunc) {
         filterLowerCased = filter.toLowerCase()
         return filter.charAt(0).toUpperCase() + filterLowerCased.slice(1)
     })
-    filterList = unique(filterList)
+    filterList = [...new Set(filterList)]
     return filterList
 }
 
