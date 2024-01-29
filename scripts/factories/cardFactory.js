@@ -6,7 +6,7 @@ export function displayCards(data) {
     const card = createElementWithClass("article", "recipeCard")
     /** Je crée et configure l'image de la recette. **/
     const cardImg = createElementWithClass("img", "recipeImg")
-    cardImg.src = `../../assets/recipes/${data.image}`
+    cardImg.src = `./assets/recipes/${data.image}`
 
     /** Je crée le conteneur pour les détails de la recette. **/
     const cardDetailsContainer = createElementWithClass("div", "recipeDetails")
