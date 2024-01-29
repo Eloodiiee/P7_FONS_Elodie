@@ -236,9 +236,7 @@ function displayNumberOfRecipe(nbOfRecipe) {
     numberOfRecipes.textContent = nbOfRecipe + (nbOfRecipe <= 1 ? " recette" : " recettes")
 }
 
-/** La function searchBy prend deux paramètres : recipeRequest qui est une chaîne de caractères représentant le champ de recherche, **/
-/** et la functionSearch qui est une function variable qui s'adapte en fonction de celle donnée dans les paramètres. **/
-/** Appel de la functionSearch en lui passant recipeRequest et les recettes. **/
+/** La function searchBy prend un paramètre : recipeRequest qui est une chaîne de caractères représentant le champ de recherche, **/
 /** Le résultat de cette recherche est stocké dans recipesFiltered. **/
 /** Réinitialise allCards pour nettoyer la liste des cartes. **/
 /** Appelle la fonction fillContainer en lui passant les recettes filtrées. **/
