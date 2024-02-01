@@ -10,8 +10,6 @@ let nbOfRecipe = 0 // Variable qui permet de stocker le nombre de recettes pour 
 let recipesFiltered = recipes // Permet de stocker les recettes filtrés.
 let recipeRequest = "" // Requête de recherche des recettes.
 let filterFunc = "" // Cette variable sert à stocker la fonction de filtrage des listes de filtres
-let filterList = [] // Variable qui stocke les listes de filtres
-let filterLowerCased = "" // Variable qui stocke les filtres en minuscule pour leur reformatage
 let selectedIngredientTags = [] // Variable qui stocke les tags d'ingrédients sélectionnés
 let selectedApplianceTags = [] // Variable qui stocke les tags d'appareils sélectionnés
 let selectedUstensilTags = [] // Variable qui stocke les tags d'ustensiles sélectionnés
@@ -133,13 +131,14 @@ advancedFilters.forEach((advancedFilter) => {
     const nameChevron = advancedFilter.querySelector(".advancedFilter-nameChevron")
     const filterName = advancedFilter.querySelector(".advancedFilterName")
     const chevron = advancedFilter.querySelector(".fa-chevron-down")
+    const filterList = advancedFilter.querySelector(".filterSearchList")
 
     /** Permet de fermer la liste de filtres en cliquant en dehors sinon exécute la fontion d'ouverture et de fermeture des listes de filtres**/
     document.body.addEventListener("click", (e) => {
         if (e.target !== nameChevron && e.target !== chevron && e.target !== filterName) {
-            closeFilter(advancedFilter, chevron)
+            closeFilter(chevron, filterList)
         } else {
-            toggleFilter(advancedFilter, chevron)
+            toggleFilter(chevron, filterList)
         }
     })
     /** boucle if qui permet d'empecher l'eventListener de se propager sur les barres de recherche de filtres **/
@@ -153,19 +152,15 @@ advancedFilters.forEach((advancedFilter) => {
 })
 
 /** Fonction qui permet de fermer les listes de filtres **/
-function closeFilter(advancedFilter, chevron) {
-    const filterList = advancedFilter.querySelector(".filterSearchList")
+function closeFilter(chevron, filterList) {
     chevron.classList.remove("rotate")
     filterList.classList.remove("open")
 }
 
 /** La Fonction toggleFilter sert a basculer l'affichage d'un filtre avancé. **/
-/** Je Sélectionne le chevron et le cadre de la liste dans advancedFilter. **
 /** Je fais Basculer avec la classe "rotate" sur le chevron pour l'animation. **/
 /** et avec la classe "open" sur "filterList" pour afficher ou masquer la liste. **/
-function toggleFilter(advancedFilter, chevron) {
-    const filterList = advancedFilter.querySelector(".filterSearchList")
-
+function toggleFilter(chevron, filterList) {
     chevron.classList.toggle("rotate")
     filterList.classList.toggle("open")
 }
@@ -259,6 +254,8 @@ function displayNumberOfRecipe(nbOfRecipe) {
 
 /** Effectue la recherche si la longueur de la chaîne est supérieure à 2 ou si l'utilisateur appuie sur Backspace. **/
 inputSearchBar.addEventListener("input", (e) => {
-    recipeRequest = removeAccents(e.target.value.toLowerCase())
-    updateRecipesByTags() // Applique les filtres par tags, puis la recherche textuelle
+    if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
+        recipeRequest = removeAccents(e.target.value.toLowerCase())
+        updateRecipesByTags() // Applique les filtres par tags, puis la recherche textuelle
+    }
 })
