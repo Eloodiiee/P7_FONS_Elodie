@@ -1,4 +1,4 @@
-import { createElementWithClass } from "./createHTMLElement.js"
+import { createElementWithClass } from "../utils/createHTMLElement.js"
 
 export function createTag(recipeRequest) {
     const tag = createElementWithClass("div", "tag", "")

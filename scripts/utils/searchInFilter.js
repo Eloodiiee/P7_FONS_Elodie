@@ -1,6 +1,6 @@
 import { removeAccents } from "./removeAccent.js"
-// La fonction "searchByFilter" filtre les recettes en fonction de quel filtre est utilisé. /
-export function searchByFilter(recipe, selectedCategoryTags, functionSearch) {
+// La fonction "searchInFilter" filtre les recettes en fonction de quel filtre est utilisé. /
+export function searchInFilter(recipe, selectedCategoryTags, functionSearch) {
     // Je vérifie si "recipe" est vide ou inexistant. Si c'est le cas, /
     if (!recipe) {
         // Je retourne une copie complète de la liste de toutes les recettes. /

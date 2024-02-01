@@ -1,20 +1,20 @@
 import { recipes } from "../data/recipes.js"
 import { displayCards } from "./factories/cardFactory.js"
 import { searchRecipes } from "./utils/searchRecipes.js"
-import { searchByFilter, searchByIngredient, searchByAppliance, searchByUstensil } from "./utils/searchByFilter.js"
-import { createTag } from "./utils/createTag.js"
+import { searchInFilter, searchByIngredient, searchByAppliance, searchByUstensil } from "./utils/searchInFilter.js"
+import { createTag } from "./factories/createTag.js"
 import { removeAccents } from "./utils/removeAccent.js"
 
 let card = [] // Initialisation de la variable qui stocke les donnés de chaque carte recette une par une.
 let nbOfRecipe = 0 // Variable qui permet de stocker le nombre de recettes pour pouvoir l'afficher.
-let recipesFiltered = [] // Permet de stocker les recettes filtrés.
+let recipesFiltered = recipes // Permet de stocker les recettes filtrés.
 let recipeRequest = "" // Requête de recherche des recettes.
 let filterFunc = "" // Cette variable sert à stocker la fonction de filtrage des listes de filtres
 let filterList = [] // Variable qui stocke les listes de filtres
 let filterLowerCased = "" // Variable qui stocke les filtres en minuscule pour leur reformatage
-let selectedIngredientTags = []
-let selectedApplianceTags = []
-let selectedUstensilTags = []
+let selectedIngredientTags = [] // Variable qui stocke les tags d'ingrédients sélectionnés
+let selectedApplianceTags = [] // Variable qui stocke les tags d'appareils sélectionnés
+let selectedUstensilTags = [] // Variable qui stocke les tags d'ustensiles sélectionnés
 
 const recipesContainer = document.querySelector(".recipesContainer") // Je sélectionne le container des recettes.
 const numberOfRecipes = document.querySelector(".number_of_recipes") // Je sélectionne le span du nombre de recettes.
@@ -22,8 +22,7 @@ const inputSearchBar = document.querySelector("#inputSearchBar") // Je sélectio
 const advancedFilters = document.querySelectorAll(".advancedFilter") // Je sélectionne les filtres avancés pour les menus dropdown.
 const tagsContainer = document.querySelector(".tags") // Je selectionne le container des tags.
 
-//////////////////////////////////////////////////////////////// Tags jaune remis au debut de mon code et réécrit  ////////////////////////////////////////////////////////////////////////////////////////
-
+/** La fonction addTag permet d'assigner un tag à sa catégorie et d'être stocké dans sa variable (selectedIngredientTags, selectedApplianceTags ou selectedUstensilTags) **/
 function addTag(tag, category) {
     switch (category) {
         case "ingredients":
@@ -37,9 +36,9 @@ function addTag(tag, category) {
             break
     }
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
-    updateRecipesByTags(selectedIngredientTags, selectedApplianceTags, selectedUstensilTags)
+    updateRecipesByTags()
 }
-
+/** La fonction removeTag permet de supprimer le tag dans sa variable (selectedIngredientTags, selectedApplianceTags ou selectedUstensilTags) **/
 function removeTag(tag, category) {
     let index
     switch (category) {
@@ -57,25 +56,29 @@ function removeTag(tag, category) {
             break
     }
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
-    updateRecipesByTags(selectedIngredientTags, selectedApplianceTags, selectedUstensilTags)
+    recipesFiltered = recipes
+    updateRecipesByTags()
 }
-
-function updateRecipesByTags(selectedIngredientTags, selectedApplianceTags, selectedUstensilTags) {
-    if (recipesFiltered.length === 0) {
-        recipesFiltered = recipes
+/** La fonction "updateRecipesByTags" permet de rechercher les recettes en fonction de la grande barre de recherche, **/
+/** et en fonction des tas sélectionnés **/
+function updateRecipesByTags() {
+    if (inputSearchBar.length === 0 && selectedIngredientTags.length === 0 && selectedApplianceTags.length === 0 && selectedUstensilTags.length === 0) {
+        recipesFiltered = recipes // Affiche toutes les recettes si aucun tag n'est sélectionné
+    } else if (selectedIngredientTags.length === 0 && selectedApplianceTags.length === 0 && selectedUstensilTags.length === 0) {
+        searchBy()
+    } else {
+        recipesFiltered = recipesFiltered.filter(
+            (recipe) =>
+                searchInFilter(recipe, selectedIngredientTags, searchByIngredient) &&
+                searchInFilter(recipe, selectedApplianceTags, searchByAppliance) &&
+                searchInFilter(recipe, selectedUstensilTags, searchByUstensil)
+        )
     }
-    const filteredRecipes = recipesFiltered.filter(
-        (recipe) =>
-            (selectedIngredientTags.length === 0 || searchByFilter(recipe, selectedIngredientTags, searchByIngredient)) &&
-            (selectedApplianceTags.length === 0 || searchByFilter(recipe, selectedApplianceTags, searchByAppliance)) &&
-            (selectedUstensilTags.length === 0 || searchByFilter(recipe, selectedUstensilTags, searchByUstensil))
-    )
-    fillContainer(filteredRecipes)
+    fillContainer()
 }
 
 /** La fonction "tagHandler" permet de pouvoir effectuer une recherche à partir des tags sélectionnés (tags jaunes).  **/
 /** Chaque tag a une clé unique qui permet de les différencier les uns des autres. **/
-/** La const "searchFunctions" regroupe les fonctions de recherche avancées **/
 /** La fonction de recherche par tag s'exécute après que la gestion des tags ait été effectué. **/
 /** La fonction de fermeture des tags est appelée pour pouvoir les fermer. **/
 function tagHandler(recipeRequest, filterID) {
@@ -104,7 +107,7 @@ function tagHandler(recipeRequest, filterID) {
 }
 
 /** La fonction "handleTagClose" permet de gérer la fermeture des tags. **/
-/** Elle supprime le bon tag de tagResults que l'utilisateur aura retiré. **/
+/** Elle supprime le bon tag que l'utilisateur aura retiré. **/
 /** Puis met à jour l'affichage des recettes. **/
 function handleTagClose(e) {
     const tagElement = e.target.closest(".tag")
@@ -112,14 +115,14 @@ function handleTagClose(e) {
         const tagKey = tagElement.dataset.tagKey
         const [tagText, category] = tagKey.split("_")
 
-        // Appel de la fonction remove tag
+        // Appel de la fonction removeTag
         removeTag(tagText, category)
 
         tagsContainer.removeChild(tagElement)
     }
 }
 
-/** La fonction "closeTag" supprime  et remet à zéro les EventListener existants, **/
+/** La fonction "closeTag" supprime et remet à zéro les EventListener existants, **/
 /** et les remplace par des nouveaux EventListener pour éviter qu'il y ait plusieurs EventListener par tag. **/
 function closeTag() {
     const allCloseBtns = tagsContainer.querySelectorAll(".fa-xmark")
@@ -131,24 +134,44 @@ function closeTag() {
     })
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /** Gestion des menus dropdDown. **/
 /** Je parcours mes filtres avancés. **/
 /** Au clic le menu s'ouvre et exécute la function toggleFilter avec le filtre en question en parametre **/
 advancedFilters.forEach((advancedFilter) => {
-    advancedFilter.children[0].addEventListener("click", () => {
-        toggleFilter(advancedFilter)
-    })
+    const nameChevron = advancedFilter.querySelector(".advancedFilter-nameChevron")
+    const filterName = advancedFilter.querySelector(".advancedFilterName")
+    const chevron = advancedFilter.querySelector(".fa-chevron-down")
 
+    /** Permet de fermer la liste de filtres en cliquant en dehors sinon exécute la fontion d'ouverture et de fermeture des listes de filtres**/
+    document.body.addEventListener("click", (e) => {
+        if (e.target !== nameChevron && e.target !== chevron && e.target !== filterName) {
+            closeFilter(advancedFilter, chevron)
+        } else {
+            toggleFilter(advancedFilter, chevron)
+        }
+    })
+    /** boucle if qui permet d'empecher l'eventListener de se propager sur les barres de recherche de filtres **/
+    const inputSearch = advancedFilter.querySelector(".input-tag")
+    if (inputSearch) {
+        inputSearch.addEventListener("click", (e) => {
+            e.stopPropagation()
+        })
+    }
     updateFilterList(advancedFilter)
 })
+
+/** Fonction qui permet de fermer les listes de filtres **/
+function closeFilter(advancedFilter, chevron) {
+    const filterList = advancedFilter.querySelector(".filterSearchList")
+    chevron.classList.remove("rotate")
+    filterList.classList.remove("open")
+}
+
 /** La Fonction toggleFilter sert a basculer l'affichage d'un filtre avancé. **/
 /** Je Sélectionne le chevron et le cadre de la liste dans advancedFilter. **
 /** Je fais Basculer avec la classe "rotate" sur le chevron pour l'animation. **/
 /** et avec la classe "open" sur "filterList" pour afficher ou masquer la liste. **/
-/** Je mets à jour la liste de filtres pour le "advancedFilter" spécifié, en appelant updateFilterList. **/
-function toggleFilter(advancedFilter) {
-    const chevron = advancedFilter.querySelector(".fa-chevron-down")
+function toggleFilter(advancedFilter, chevron) {
     const filterList = advancedFilter.querySelector(".filterSearchList")
 
     chevron.classList.toggle("rotate")
@@ -193,14 +216,14 @@ function updateFilterList(advancedFilter) {
         inputTag.addEventListener("input", (e) => {
             recipeRequest = removeAccents(e.target.value.toLowerCase())
             const filteredList = filterList.filter((item) => removeAccents(item).toLowerCase().includes(recipeRequest))
-            updateLiList(filteredList, liLists[0], inputTag)
+            updateLiList(filteredList, liLists[0], inputTag, advancedFilter)
         })
-        updateLiList(filterList, liLists[0], inputTag) // Initialise avec la liste complète.
+        updateLiList(filterList, liLists[0], inputTag, advancedFilter) // Initialise avec la liste complète.
     })
 }
 
 /** La fonction "updateLiList" permet de mettre à jour la liste des suggestion en fonction de ce qui est ecrit dans le champ du filtre. **/
-function updateLiList(filterList, liList, inputTag) {
+function updateLiList(filterList, liList, inputTag, advancedFilter) {
     liList.innerHTML = "" // Nettoie les suggestions précédentes.
     filterList.forEach((filter) => {
         const li = document.createElement("li")
@@ -209,26 +232,24 @@ function updateLiList(filterList, liList, inputTag) {
         li.addEventListener("click", () => {
             inputTag.value = "" // Réinitialise le champs après selection du tag.
             tagHandler(filter, inputTag.id) // Gére la sélection.
+            updateFilterList(advancedFilter) // Réactualise l'affichage des listes de filtres quand un tag est sélectionné.
         })
     })
 }
-///////////////////////////////////////////////////////////////
-/** Function fillContainer qui permet d'afficher toutes les cartes de recette, **/
+
+/** Function fillContainer permet d'afficher toutes les cartes de recette, **/
 /** au chargement de la page et en fonction du résultat de la recherche. **/
-function fillContainer(recipesToBeDisplayed) {
+function fillContainer() {
     recipesContainer.innerHTML = ""
-    for (let i = 0; i < recipesToBeDisplayed.length; i++) {
-        const recipe = recipesToBeDisplayed[i]
+    recipesFiltered.forEach((recipe) => {
         card = displayCards(recipe)
         recipesContainer.appendChild(card)
-    }
-    nbOfRecipe = recipesToBeDisplayed.length
-
+    })
+    nbOfRecipe = recipesFiltered.length
     displayNumberOfRecipe(nbOfRecipe)
 }
-
 /** Exécution de la funtion fillContainer au chargement de la page **/
-fillContainer(recipes)
+fillContainer()
 
 /** Function displayNumberOfRecipe qui permet d'afficher le nombre de recettes en temps réel **/
 /** Cette function se base sur le nombre de recettes de recipes.js **/
@@ -236,19 +257,16 @@ function displayNumberOfRecipe(nbOfRecipe) {
     numberOfRecipes.textContent = nbOfRecipe + (nbOfRecipe <= 1 ? " recette" : " recettes")
 }
 
-/** La function searchBy prend un paramètre : recipeRequest qui est une chaîne de caractères représentant le champ de recherche, **/
+/** La function searchBy permet de rechercher la recette correspondante par rapport à ce qu'a recherché l'utilisateur dans la grande barre de recherche. **/
 /** Le résultat de cette recherche est stocké dans recipesFiltered. **/
-/** Réinitialise allCards pour nettoyer la liste des cartes. **/
-/** Appelle la fonction fillContainer en lui passant les recettes filtrées. **/
-function searchBy(recipeRequest) {
+/** Appelle la fonction fillContainer pour actualiser l'affichage des recettes. **/
+function searchBy() {
+    recipeRequest = removeAccents(inputSearchBar.value.toLowerCase())
     recipesFiltered = searchRecipes(recipeRequest, recipes)
-    fillContainer(recipesFiltered)
-}
-
-/** Effectue la recherche si la longueur de la chaîne est supérieure à 2 ou si l'utilisateur appuie sur Backspace. **/
+    fillContainer()
+} /** Effectue la recherche si la longueur de la chaîne est supérieure à 2 ou si l'utilisateur appuie sur Backspace. **/
 inputSearchBar.addEventListener("input", (e) => {
-    recipeRequest = removeAccents(e.target.value.toLowerCase())
     if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
-        searchBy(recipeRequest)
+        searchBy()
     }
 })
