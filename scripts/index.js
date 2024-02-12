@@ -273,17 +273,4 @@ inputSearchBar.addEventListener("input", (e) => {
     if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
         fillContainer()
     }
-
-    //     if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
-    //         recipeRequest = removeAccents(e.target.value.toLowerCase())
-    //         if (tagsContainer.childNodes.length == 0) {
-    //             recipesFiltered = searchRecipes(recipeRequest, recipes)
-    //             advancedFilters.forEach(updateFilterList)
-    //         } else {
-    //             recipesFiltered = searchRecipes(recipeRequest, recipes)
-    //             updateRecipesByTags()
-    //             advancedFilters.forEach(updateFilterList)
-    //         }
-    //         fillContainer()
-    //     }
 })
