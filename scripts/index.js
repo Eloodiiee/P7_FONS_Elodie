@@ -77,8 +77,6 @@ function updateRecipesByTags() {
             searchInFilter(recipe, selectedApplianceTags, searchByAppliance) &&
             searchInFilter(recipe, selectedUstensilTags, searchByUstensil)
     )
-    console.log(filteredByTags)
-    console.log(recipesFiltered)
     recipesFiltered = filteredByTags
 
     fillContainer() // Met à jour l'affichage avec les recettes filtrées
@@ -279,14 +277,12 @@ inputSearchBar.addEventListener("input", (e) => {
     if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
         recipeRequest = removeAccents(e.target.value.toLowerCase())
         if (tagsContainer.childNodes.length == 0) {
-            console.log("recherche sans tag")
             recipesFiltered = searchRecipes(recipeRequest, recipes)
             for (let i = 0; i < advancedFilters.length; i++) {
                 const advancedFilter = advancedFilters[i]
                 updateFilterList(advancedFilter) // Met à jour les listes de filtres
             }
         } else {
-            console.log("recherche avec tag")
             recipesFiltered = searchRecipes(recipeRequest, recipes)
             updateRecipesByTags()
             for (let i = 0; i < advancedFilters.length; i++) {
