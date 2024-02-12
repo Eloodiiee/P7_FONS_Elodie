@@ -13,6 +13,7 @@ let filterFunc = "" // Cette variable sert à stocker la fonction de filtrage de
 let selectedIngredientTags = [] // Variable qui stocke les tags d'ingrédients sélectionnés
 let selectedApplianceTags = [] // Variable qui stocke les tags d'appareils sélectionnés
 let selectedUstensilTags = [] // Variable qui stocke les tags d'ustensiles sélectionnés
+let filteredByTags = []
 
 const recipesContainer = document.querySelector(".recipesContainer") // Je sélectionne le container des recettes.
 const numberOfRecipes = document.querySelector(".number_of_recipes") // Je sélectionne le span du nombre de recettes.
@@ -55,7 +56,7 @@ function removeTag(tag, category) {
             break
     }
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
-    recipesFiltered = recipes
+    recipesFiltered = searchRecipes(recipeRequest, recipes)
     updateRecipesByTags()
     advancedFilters.forEach(updateFilterList) // Met à jour les listes de filtres
 }
@@ -64,19 +65,15 @@ function removeTag(tag, category) {
 /** et en fonction des tas sélectionnés **/
 function updateRecipesByTags() {
     // Filtre d'abord les recettes en fonction des tags sélectionnés
-    let filteredByTags = recipes.filter(
+    filteredByTags = recipesFiltered.filter(
         (recipe) =>
             searchInFilter(recipe, selectedIngredientTags, searchByIngredient) &&
             searchInFilter(recipe, selectedApplianceTags, searchByAppliance) &&
             searchInFilter(recipe, selectedUstensilTags, searchByUstensil)
     )
-
-    // Applique ensuite la recherche textuelle sur les résultats filtrés par tags
-    if (recipeRequest !== "") {
-        recipesFiltered = searchRecipes(recipeRequest, filteredByTags)
-    } else {
-        recipesFiltered = filteredByTags
-    }
+    console.log(filteredByTags)
+    console.log(recipesFiltered)
+    recipesFiltered = filteredByTags
 
     fillContainer() // Met à jour l'affichage avec les recettes filtrées
 }
@@ -87,13 +84,27 @@ function updateRecipesByTags() {
 /** La fonction de fermeture des tags est appelée pour pouvoir les fermer. **/
 function tagHandler(recipeRequest, filterID) {
     const lowerCaseRequest = removeAccents(recipeRequest.toLowerCase())
-    const tag = createTag(recipeRequest)
+    /** Permet de s'assurer que l'utilisateur ne peux pas ajouter deux fois le même tag. **/
+    const existingTag = [...tagsContainer.children].some((tag) => {
+        /** S'assure que tagKey est défini **/
+        if (!tag.dataset.tagKey) {
+            return false
+        }
 
-    tagsContainer.appendChild(tag)
-    tag.dataset.tagKey = lowerCaseRequest + "_" + filterID
-
-    addTag(lowerCaseRequest, filterID)
-    closeTag()
+        const tagKeyParts = tag.dataset.tagKey.split("_")
+        const tagText = tag.children[0].innerText.toLowerCase()
+        return tagText === lowerCaseRequest && tagKeyParts[1] === filterID
+    })
+    /** Après avoir vérifié que le tag n'est pas un doublon, exécute le code du tag normalement. **/
+    if (!existingTag) {
+        const tag = createTag(recipeRequest)
+        tagsContainer.appendChild(tag)
+        tag.dataset.tagKey = lowerCaseRequest + "_" + filterID
+        tagsContainer.appendChild(tag)
+        tag.dataset.tagKey = lowerCaseRequest + "_" + filterID
+        addTag(lowerCaseRequest, filterID)
+        closeTag()
+    }
 }
 
 /** La fonction "handleTagClose" permet de gérer la fermeture des tags. **/
@@ -205,7 +216,7 @@ function updateFilterList(advancedFilter) {
                 break
         }
 
-        const filterList = createFilterList(recipes, filterFunc, selectedTags)
+        const filterList = createFilterList(recipesFiltered, filterFunc, selectedTags)
         /** Une fois la liste de suggestion créée les dupliqués sont supprimés. **/
         /** L'EventListener "inputTag" permet de récupérer ce qui a été écrit dans le champ du filtre et appelle la fonction de mise à jour la liste de suggestion. **/
         inputTag.addEventListener("input", (e) => {
@@ -256,6 +267,14 @@ function displayNumberOfRecipe(nbOfRecipe) {
 inputSearchBar.addEventListener("input", (e) => {
     if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
         recipeRequest = removeAccents(e.target.value.toLowerCase())
-        updateRecipesByTags() // Applique les filtres par tags, puis la recherche textuelle
+        if (tagsContainer.childNodes.length == 0) {
+            recipesFiltered = searchRecipes(recipeRequest, recipes)
+            advancedFilters.forEach(updateFilterList)
+        } else {
+            recipesFiltered = searchRecipes(recipeRequest, recipes)
+            updateRecipesByTags()
+            advancedFilters.forEach(updateFilterList)
+        }
+        fillContainer()
     }
 })
