@@ -71,8 +71,6 @@ function updateRecipesByTags() {
             searchInFilter(recipe, selectedApplianceTags, searchByAppliance) &&
             searchInFilter(recipe, selectedUstensilTags, searchByUstensil)
     )
-    console.log(filteredByTags)
-    console.log(recipesFiltered)
     recipesFiltered = filteredByTags
 
     fillContainer() // Met à jour l'affichage avec les recettes filtrées
