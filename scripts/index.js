@@ -1,5 +1,5 @@
 import { recipes } from "../data/recipes.js"
-import { displayCards } from "./factories/cardFactory_for.js"
+import { displayCards } from "./factories/cardFactory.js"
 import { searchRecipes } from "./utils/searchRecipes.js"
 import { searchInFilter, searchByIngredient, searchByAppliance, searchByUstensil } from "./utils/searchInFilter.js"
 import { createTag } from "./factories/createTag.js"
