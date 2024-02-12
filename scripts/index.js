@@ -1,5 +1,5 @@
 import { recipes } from "../data/recipes.js"
-import { displayCards } from "./factories/cardFactory.js"
+import { displayCards } from "./factories/cardFactory_for.js"
 import { searchRecipes } from "./utils/searchRecipes.js"
 import { searchInFilter, searchByIngredient, searchByAppliance, searchByUstensil } from "./utils/searchInFilter.js"
 import { createTag } from "./factories/createTag.js"
@@ -36,7 +36,10 @@ function addTag(tag, category) {
     }
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
     updateRecipesByTags()
-    advancedFilters.forEach(updateFilterList) // Met à jour les listes de filtres
+    for (let i = 0; i < advancedFilters.length; i++) {
+        const advancedFilter = advancedFilters[i]
+        updateFilterList(advancedFilter) // Met à jour les listes de filtres
+    }
 }
 /** La fonction removeTag permet de supprimer le tag dans sa variable (selectedIngredientTags, selectedApplianceTags ou selectedUstensilTags) **/
 function removeTag(tag, category) {
@@ -58,7 +61,10 @@ function removeTag(tag, category) {
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
     recipesFiltered = searchRecipes(recipeRequest, recipes)
     updateRecipesByTags()
-    advancedFilters.forEach(updateFilterList) // Met à jour les listes de filtres
+    for (let i = 0; i < advancedFilters.length; i++) {
+        const advancedFilter = advancedFilters[i]
+        updateFilterList(advancedFilter) // Met à jour les listes de filtres
+    }
 }
 
 /** La fonction "updateRecipesByTags" permet de rechercher les recettes en fonction de la grande barre de recherche, **/
@@ -71,6 +77,8 @@ function updateRecipesByTags() {
             searchInFilter(recipe, selectedApplianceTags, searchByAppliance) &&
             searchInFilter(recipe, selectedUstensilTags, searchByUstensil)
     )
+    console.log(filteredByTags)
+    console.log(recipesFiltered)
     recipesFiltered = filteredByTags
 
     fillContainer() // Met à jour l'affichage avec les recettes filtrées
@@ -125,18 +133,21 @@ function handleTagClose(e) {
 /** et les remplace par des nouveaux EventListener pour éviter qu'il y ait plusieurs EventListener par tag. **/
 function closeTag() {
     const allCloseBtns = tagsContainer.querySelectorAll(".fa-xmark")
-    allCloseBtns.forEach((closeBtn) => {
+    for (let i = 0; i < allCloseBtns.length; i++) {
+        const closeBtn = allCloseBtns[i]
         closeBtn.removeEventListener("click", handleTagClose)
-    })
-    allCloseBtns.forEach((closeBtn) => {
+    }
+    for (let i = 0; i < allCloseBtns.length; i++) {
+        const closeBtn = allCloseBtns[i]
         closeBtn.addEventListener("click", handleTagClose)
-    })
+    }
 }
 
 /** Gestion des menus dropdDown. **/
 /** Je parcours mes filtres avancés. **/
 /** Au clic le menu s'ouvre et exécute la function toggleFilter avec le filtre en question en parametre **/
-advancedFilters.forEach((advancedFilter) => {
+for (let i = 0; i < advancedFilters.length; i++) {
+    const advancedFilter = advancedFilters[i]
     const nameChevron = advancedFilter.querySelector(".advancedFilter-nameChevron")
     const filterName = advancedFilter.querySelector(".advancedFilterName")
     const chevron = advancedFilter.querySelector(".fa-chevron-down")
@@ -158,7 +169,7 @@ advancedFilters.forEach((advancedFilter) => {
         })
     }
     updateFilterList(advancedFilter)
-})
+}
 
 /** Fonction qui permet de fermer les listes de filtres **/
 function closeFilter(chevron, filterList) {
@@ -196,8 +207,8 @@ function createFilterList(recipes, filterFunc, selectedTags) {
 function updateFilterList(advancedFilter) {
     const inputTags = advancedFilter.querySelectorAll(".input-tag")
     const liLists = advancedFilter.querySelectorAll(".li-list")
-
-    inputTags.forEach((inputTag) => {
+    for (let i = 0; i < inputTags.length; i++) {
+        const inputTag = inputTags[i]
         let selectedTags
         switch (inputTag.id) {
             case "ingredients":
@@ -223,13 +234,14 @@ function updateFilterList(advancedFilter) {
             updateLiList(filteredList, liLists[0], inputTag, advancedFilter)
         })
         updateLiList(filterList, liLists[0], inputTag, advancedFilter) // Initialise avec la liste complète.
-    })
+    }
 }
 
 /** La fonction "updateLiList" permet de mettre à jour la liste des suggestion en fonction de ce qui est ecrit dans le champ du filtre. **/
 function updateLiList(filterList, liList, inputTag, advancedFilter) {
     liList.innerHTML = "" // Nettoie les suggestions précédentes.
-    filterList.forEach((filter) => {
+    for (let i = 0; i < filterList.length; i++) {
+        const filter = filterList[i]
         const li = document.createElement("li")
         li.textContent = filter
         liList.appendChild(li)
@@ -238,17 +250,18 @@ function updateLiList(filterList, liList, inputTag, advancedFilter) {
             tagHandler(filter, inputTag.id) // Gére la sélection.
             updateFilterList(advancedFilter) // Réactualise l'affichage des listes de filtres quand un tag est sélectionné.
         })
-    })
+    }
 }
 
 /** Function fillContainer permet d'afficher toutes les cartes de recette, **/
 /** au chargement de la page et en fonction du résultat de la recherche. **/
 function fillContainer() {
     recipesContainer.innerHTML = ""
-    recipesFiltered.forEach((recipe) => {
+    for (let i = 0; i < recipesFiltered.length; i++) {
+        const recipe = recipesFiltered[i]
         card = displayCards(recipe)
         recipesContainer.appendChild(card)
-    })
+    }
     nbOfRecipe = recipesFiltered.length
     displayNumberOfRecipe(nbOfRecipe)
 }
@@ -266,12 +279,20 @@ inputSearchBar.addEventListener("input", (e) => {
     if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
         recipeRequest = removeAccents(e.target.value.toLowerCase())
         if (tagsContainer.childNodes.length == 0) {
+            console.log("recherche sans tag")
             recipesFiltered = searchRecipes(recipeRequest, recipes)
-            advancedFilters.forEach(updateFilterList)
+            for (let i = 0; i < advancedFilters.length; i++) {
+                const advancedFilter = advancedFilters[i]
+                updateFilterList(advancedFilter) // Met à jour les listes de filtres
+            }
         } else {
+            console.log("recherche avec tag")
             recipesFiltered = searchRecipes(recipeRequest, recipes)
             updateRecipesByTags()
-            advancedFilters.forEach(updateFilterList)
+            for (let i = 0; i < advancedFilters.length; i++) {
+                const advancedFilter = advancedFilters[i]
+                updateFilterList(advancedFilter) // Met à jour les listes de filtres
+            }
         }
         fillContainer()
     }
