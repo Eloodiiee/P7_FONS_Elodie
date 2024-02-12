@@ -58,7 +58,6 @@ function removeTag(tag, category) {
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
     recipesFiltered = searchRecipes(recipeRequest, recipes)
     updateRecipesByTags()
-    advancedFilters.forEach(updateFilterList) // Met à jour les listes de filtres
 }
 
 /** La fonction "updateRecipesByTags" permet de rechercher les recettes en fonction de la grande barre de recherche, **/
@@ -72,8 +71,7 @@ function updateRecipesByTags() {
             searchInFilter(recipe, selectedUstensilTags, searchByUstensil)
     )
     recipesFiltered = filteredByTags
-
-    fillContainer() // Met à jour l'affichage avec les recettes filtrées
+    fillContainer()
 }
 
 /** La fonction "tagHandler" permet de pouvoir effectuer une recherche à partir des tags sélectionnés.  **/
@@ -251,6 +249,7 @@ function fillContainer() {
     })
     nbOfRecipe = recipesFiltered.length
     displayNumberOfRecipe(nbOfRecipe)
+    advancedFilters.forEach(updateFilterList) // Met à jour les listes de filtres
 }
 /** Exécution de la funtion fillContainer au chargement de la page **/
 fillContainer()

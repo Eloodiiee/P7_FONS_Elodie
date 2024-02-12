@@ -3,9 +3,7 @@ import { removeAccents } from "./removeAccent.js"
 export function searchRecipes(recipeRequest, allRecipes) {
     /** Je vérifie si "recipeRequest" est vide ou inexistant. **/
     /** Si c'est le cas, je retourne une copie complète de la liste de toutes les recettes. **/
-    if (!recipeRequest) {
-        return [...allRecipes]
-    }
+
     /** Si "recipeRequest" n'est pas vide, filtre allRecipes. **/
     /** Pour chaque recette dans allRecipes, effectue les vérifications suivantes : **/
     return allRecipes.filter(
