@@ -13,8 +13,6 @@ let filterFunc = "" // Cette variable sert à stocker la fonction de filtrage de
 let selectedIngredientTags = [] // Variable qui stocke les tags d'ingrédients sélectionnés
 let selectedApplianceTags = [] // Variable qui stocke les tags d'appareils sélectionnés
 let selectedUstensilTags = [] // Variable qui stocke les tags d'ustensiles sélectionnés
-let filteredByTags = []
-let filteredList = []
 
 const recipesContainer = document.querySelector(".recipesContainer") // Je sélectionne le container des recettes.
 const numberOfRecipes = document.querySelector(".number_of_recipes") // Je sélectionne le span du nombre de recettes.
@@ -37,9 +35,7 @@ function addTag(tag, category) {
     }
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
     updateRecipesByTags()
-    for (let i = 0; i < advancedFilters.length; i++) {
-        updateFilterList(advancedFilters[i]) // Met à jour les listes de filtres
-    }
+    //advancedFilters.forEach(updateFilterList) // Met à jour les listes de filtres
 }
 /** La fonction removeTag permet de supprimer le tag dans sa variable (selectedIngredientTags, selectedApplianceTags ou selectedUstensilTags) **/
 function removeTag(tag, category) {
@@ -61,27 +57,20 @@ function removeTag(tag, category) {
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
     recipesFiltered = searchRecipes(recipeRequest, recipes)
     updateRecipesByTags()
-    for (let i = 0; i < advancedFilters.length; i++) {
-        updateFilterList(advancedFilters[i])
-    }
 }
 
 /** La fonction "updateRecipesByTags" permet de rechercher les recettes en fonction de la grande barre de recherche, **/
 /** et en fonction des tas sélectionnés **/
 function updateRecipesByTags() {
     // Filtre d'abord les recettes en fonction des tags sélectionnés
-    for (let i = 0; i < recipesFiltered.length; i++) {
-        const recipe = recipesFiltered[i]
-        if (
+    recipesFiltered = recipesFiltered.filter(
+        (recipe) =>
             searchInFilter(recipe, selectedIngredientTags, searchByIngredient) &&
             searchInFilter(recipe, selectedApplianceTags, searchByAppliance) &&
             searchInFilter(recipe, selectedUstensilTags, searchByUstensil)
-        ) {
-            filteredByTags.push(recipe)
-        }
-    }
-    recipesFiltered = filteredByTags
-    fillContainer() // Met à jour l'affichage avec les recettes filtrées
+    )
+
+    fillContainer()
 }
 
 /** La fonction "tagHandler" permet de pouvoir effectuer une recherche à partir des tags sélectionnés.  **/
@@ -186,12 +175,26 @@ function toggleFilter(chevron, filterList) {
 /** Chaque filtre est changé en miniscule puis la première lettre est remise en majuscule **/
 /** pour retirer les doublons qui ont une casse différentes et qui ont besoin d'être reformaté pour être filtré**/
 function createFilterList(recipes, filterFunc, selectedTags) {
+    /** Version avec filter **/
+    /*    let filterList = recipes.map(filterFunc).flat()
+    filterList = filterList.map((filter) => {
+        let filterLowerCased = filter.toLowerCase()
+        return filter.charAt(0).toUpperCase() + filterLowerCased.slice(1)
+    })
+    filterList = [...new Set(filterList)]
+
+    // Exclut les tags sélectionnés de la liste
+    filterList = filterList.filter((filter) => !selectedTags.includes(removeAccents(filter).toLowerCase()))
+
+    return filterList */
+
+    /** Version sans filter **/
     let tempFilterList = recipes.map(filterFunc).flat()
     let filterList = []
     for (let i = 0; i < tempFilterList.length; i++) {
         let filterLowerCased = tempFilterList[i].toLowerCase()
         let filterFormatted = tempFilterList[i].charAt(0).toUpperCase() + filterLowerCased.slice(1)
-        if (!selectedTags.includes(filterLowerCased)) {
+        if (!selectedTags.includes(removeAccents(filterLowerCased))) {
             filterList.push(filterFormatted)
         }
     }
@@ -205,6 +208,7 @@ function createFilterList(recipes, filterFunc, selectedTags) {
 function updateFilterList(advancedFilter) {
     const inputTags = advancedFilter.querySelectorAll(".input-tag")
     const liLists = advancedFilter.querySelectorAll(".li-list")
+
     for (let i = 0; i < inputTags.length; i++) {
         const inputTag = inputTags[i]
         let selectedTags
@@ -228,11 +232,7 @@ function updateFilterList(advancedFilter) {
         /** L'EventListener "inputTag" permet de récupérer ce qui a été écrit dans le champ du filtre et appelle la fonction de mise à jour la liste de suggestion. **/
         inputTag.addEventListener("input", (e) => {
             recipeRequest = removeAccents(e.target.value.toLowerCase())
-            for (let i = 0; i < filterList.length; i++) {
-                if (removeAccents(filterList[i]).toLowerCase().includes(recipeRequest)) {
-                    filteredList.push(filterList[i])
-                }
-            }
+            const filteredList = filterList.filter((item) => removeAccents(item).toLowerCase().includes(recipeRequest))
             updateLiList(filteredList, liLists[0], inputTag, advancedFilter)
         })
         updateLiList(filterList, liLists[0], inputTag, advancedFilter) // Initialise avec la liste complète.
@@ -258,7 +258,6 @@ function updateLiList(filterList, liList, inputTag, advancedFilter) {
 /** Function fillContainer permet d'afficher toutes les cartes de recette, **/
 /** au chargement de la page et en fonction du résultat de la recherche. **/
 function fillContainer() {
-    recipesContainer.innerHTML = ""
     for (let i = 0; i < recipesFiltered.length; i++) {
         const recipe = recipesFiltered[i]
         card = displayCards(recipe)
@@ -269,6 +268,9 @@ function fillContainer() {
     }
     nbOfRecipe = recipesFiltered.length
     displayNumberOfRecipe(nbOfRecipe)
+    for (let i = 0; i < advancedFilters.length; i++) {
+        updateFilterList(advancedFilters[i])
+    } // Met à jour les listes de filtres
 }
 /** Exécution de la funtion fillContainer au chargement de la page **/
 fillContainer()
@@ -281,14 +283,16 @@ function displayNumberOfRecipe(nbOfRecipe) {
 
 /** Effectue la recherche si la longueur de la chaîne est supérieure à 2 ou si l'utilisateur appuie sur Backspace. **/
 inputSearchBar.addEventListener("input", (e) => {
-    if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
+    if (e.inputType === "deleteContentBackward") {
+        recipeRequest = removeAccents(e.target.value.toLowerCase()) //Ajouté pour éviter de reset l'affichage si l'utilisateur retire le contenu de inputSearchBar avant de retirer un tag
+        recipesFiltered = recipes
+        updateRecipesByTags()
+    }
+    if (inputSearchBar.value.length > 2) {
         recipeRequest = removeAccents(e.target.value.toLowerCase())
-        if (tagsContainer.childNodes.length == 0) {
-            recipesFiltered = searchRecipes(recipeRequest, recipes)
-        } else {
-            recipesFiltered = searchRecipes(recipeRequest, recipes)
-            updateRecipesByTags()
-        }
+        recipesFiltered = searchRecipes(recipeRequest, recipesFiltered)
+    }
+    if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
         fillContainer()
     }
 })
