@@ -13,7 +13,6 @@ let filterFunc = "" // Cette variable sert à stocker la fonction de filtrage de
 let selectedIngredientTags = [] // Variable qui stocke les tags d'ingrédients sélectionnés
 let selectedApplianceTags = [] // Variable qui stocke les tags d'appareils sélectionnés
 let selectedUstensilTags = [] // Variable qui stocke les tags d'ustensiles sélectionnés
-let filteredByTags = []
 
 const recipesContainer = document.querySelector(".recipesContainer") // Je sélectionne le container des recettes.
 const numberOfRecipes = document.querySelector(".number_of_recipes") // Je sélectionne le span du nombre de recettes.
@@ -36,7 +35,6 @@ function addTag(tag, category) {
     }
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
     updateRecipesByTags()
-    advancedFilters.forEach(updateFilterList) // Met à jour les listes de filtres
 }
 /** La fonction removeTag permet de supprimer le tag dans sa variable (selectedIngredientTags, selectedApplianceTags ou selectedUstensilTags) **/
 function removeTag(tag, category) {
@@ -64,13 +62,12 @@ function removeTag(tag, category) {
 /** et en fonction des tas sélectionnés **/
 function updateRecipesByTags() {
     // Filtre d'abord les recettes en fonction des tags sélectionnés
-    filteredByTags = recipesFiltered.filter(
+    recipesFiltered = recipesFiltered.filter(
         (recipe) =>
             searchInFilter(recipe, selectedIngredientTags, searchByIngredient) &&
             searchInFilter(recipe, selectedApplianceTags, searchByAppliance) &&
             searchInFilter(recipe, selectedUstensilTags, searchByUstensil)
     )
-    recipesFiltered = filteredByTags
     fillContainer()
 }
 
@@ -184,7 +181,7 @@ function createFilterList(recipes, filterFunc, selectedTags) {
     filterList = [...new Set(filterList)]
 
     // Exclut les tags sélectionnés de la liste
-    filterList = filterList.filter((filter) => !selectedTags.includes(filter.toLowerCase()))
+    filterList = filterList.filter((filter) => !selectedTags.includes(removeAccents(filter).toLowerCase()))
 
     return filterList
 }
@@ -263,6 +260,7 @@ function displayNumberOfRecipe(nbOfRecipe) {
 /** Effectue la recherche si la longueur de la chaîne est supérieure à 2 ou si l'utilisateur appuie sur Backspace. **/
 inputSearchBar.addEventListener("input", (e) => {
     if (e.inputType === "deleteContentBackward") {
+        recipeRequest = removeAccents(e.target.value.toLowerCase()) //Ajouté pour éviter de reset l'affichage si l'utilisateur retire le contenu de inputSearchBar avant de retirer un tag
         recipesFiltered = recipes
         updateRecipesByTags()
     }
