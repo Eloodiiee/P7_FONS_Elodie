@@ -14,6 +14,7 @@ let selectedIngredientTags = [] // Variable qui stocke les tags d'ingrédients s
 let selectedApplianceTags = [] // Variable qui stocke les tags d'appareils sélectionnés
 let selectedUstensilTags = [] // Variable qui stocke les tags d'ustensiles sélectionnés
 let filteredByTags = []
+let filteredList = []
 
 const recipesContainer = document.querySelector(".recipesContainer") // Je sélectionne le container des recettes.
 const numberOfRecipes = document.querySelector(".number_of_recipes") // Je sélectionne le span du nombre de recettes.
@@ -37,8 +38,7 @@ function addTag(tag, category) {
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
     updateRecipesByTags()
     for (let i = 0; i < advancedFilters.length; i++) {
-        const advancedFilter = advancedFilters[i]
-        updateFilterList(advancedFilter) // Met à jour les listes de filtres
+        updateFilterList(advancedFilters[i]) // Met à jour les listes de filtres
     }
 }
 /** La fonction removeTag permet de supprimer le tag dans sa variable (selectedIngredientTags, selectedApplianceTags ou selectedUstensilTags) **/
@@ -62,8 +62,7 @@ function removeTag(tag, category) {
     recipesFiltered = searchRecipes(recipeRequest, recipes)
     updateRecipesByTags()
     for (let i = 0; i < advancedFilters.length; i++) {
-        const advancedFilter = advancedFilters[i]
-        updateFilterList(advancedFilter) // Met à jour les listes de filtres
+        updateFilterList(advancedFilters[i])
     }
 }
 
@@ -71,14 +70,17 @@ function removeTag(tag, category) {
 /** et en fonction des tas sélectionnés **/
 function updateRecipesByTags() {
     // Filtre d'abord les recettes en fonction des tags sélectionnés
-    filteredByTags = recipesFiltered.filter(
-        (recipe) =>
+    for (let i = 0; i < recipesFiltered.length; i++) {
+        const recipe = recipesFiltered[i]
+        if (
             searchInFilter(recipe, selectedIngredientTags, searchByIngredient) &&
             searchInFilter(recipe, selectedApplianceTags, searchByAppliance) &&
             searchInFilter(recipe, selectedUstensilTags, searchByUstensil)
-    )
+        ) {
+            filteredByTags.push(recipe)
+        }
+    }
     recipesFiltered = filteredByTags
-
     fillContainer() // Met à jour l'affichage avec les recettes filtrées
 }
 
@@ -134,9 +136,6 @@ function closeTag() {
     for (let i = 0; i < allCloseBtns.length; i++) {
         const closeBtn = allCloseBtns[i]
         closeBtn.removeEventListener("click", handleTagClose)
-    }
-    for (let i = 0; i < allCloseBtns.length; i++) {
-        const closeBtn = allCloseBtns[i]
         closeBtn.addEventListener("click", handleTagClose)
     }
 }
@@ -187,15 +186,16 @@ function toggleFilter(chevron, filterList) {
 /** Chaque filtre est changé en miniscule puis la première lettre est remise en majuscule **/
 /** pour retirer les doublons qui ont une casse différentes et qui ont besoin d'être reformaté pour être filtré**/
 function createFilterList(recipes, filterFunc, selectedTags) {
-    let filterList = recipes.map(filterFunc).flat()
-    filterList = filterList.map((filter) => {
-        let filterLowerCased = filter.toLowerCase()
-        return filter.charAt(0).toUpperCase() + filterLowerCased.slice(1)
-    })
-    filterList = [...new Set(filterList)]
-
-    // Exclut les tags sélectionnés de la liste
-    filterList = filterList.filter((filter) => !selectedTags.includes(filter.toLowerCase()))
+    let tempFilterList = recipes.map(filterFunc).flat()
+    let filterList = []
+    for (let i = 0; i < tempFilterList.length; i++) {
+        let filterLowerCased = tempFilterList[i].toLowerCase()
+        let filterFormatted = tempFilterList[i].charAt(0).toUpperCase() + filterLowerCased.slice(1)
+        if (!selectedTags.includes(filterLowerCased)) {
+            filterList.push(filterFormatted)
+        }
+    }
+    filterList = [...new Set(filterList)] // Pour enlever les doublons après la conversion
 
     return filterList
 }
@@ -228,7 +228,11 @@ function updateFilterList(advancedFilter) {
         /** L'EventListener "inputTag" permet de récupérer ce qui a été écrit dans le champ du filtre et appelle la fonction de mise à jour la liste de suggestion. **/
         inputTag.addEventListener("input", (e) => {
             recipeRequest = removeAccents(e.target.value.toLowerCase())
-            const filteredList = filterList.filter((item) => removeAccents(item).toLowerCase().includes(recipeRequest))
+            for (let i = 0; i < filterList.length; i++) {
+                if (removeAccents(filterList[i]).toLowerCase().includes(recipeRequest)) {
+                    filteredList.push(filterList[i])
+                }
+            }
             updateLiList(filteredList, liLists[0], inputTag, advancedFilter)
         })
         updateLiList(filterList, liLists[0], inputTag, advancedFilter) // Initialise avec la liste complète.
@@ -260,6 +264,9 @@ function fillContainer() {
         card = displayCards(recipe)
         recipesContainer.appendChild(card)
     }
+    for (let i = 0; i < advancedFilters.length; i++) {
+        updateFilterList(advancedFilters[i])
+    }
     nbOfRecipe = recipesFiltered.length
     displayNumberOfRecipe(nbOfRecipe)
 }
@@ -278,17 +285,9 @@ inputSearchBar.addEventListener("input", (e) => {
         recipeRequest = removeAccents(e.target.value.toLowerCase())
         if (tagsContainer.childNodes.length == 0) {
             recipesFiltered = searchRecipes(recipeRequest, recipes)
-            for (let i = 0; i < advancedFilters.length; i++) {
-                const advancedFilter = advancedFilters[i]
-                updateFilterList(advancedFilter) // Met à jour les listes de filtres
-            }
         } else {
             recipesFiltered = searchRecipes(recipeRequest, recipes)
             updateRecipesByTags()
-            for (let i = 0; i < advancedFilters.length; i++) {
-                const advancedFilter = advancedFilters[i]
-                updateFilterList(advancedFilter) // Met à jour les listes de filtres
-            }
         }
         fillContainer()
     }
