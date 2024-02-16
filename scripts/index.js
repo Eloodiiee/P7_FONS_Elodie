@@ -175,19 +175,6 @@ function toggleFilter(chevron, filterList) {
 /** Chaque filtre est changé en miniscule puis la première lettre est remise en majuscule **/
 /** pour retirer les doublons qui ont une casse différentes et qui ont besoin d'être reformaté pour être filtré**/
 function createFilterList(recipes, filterFunc, selectedTags) {
-    /** Version avec filter **/
-    /*    let filterList = recipes.map(filterFunc).flat()
-    filterList = filterList.map((filter) => {
-        let filterLowerCased = filter.toLowerCase()
-        return filter.charAt(0).toUpperCase() + filterLowerCased.slice(1)
-    })
-    filterList = [...new Set(filterList)]
-
-    // Exclut les tags sélectionnés de la liste
-    filterList = filterList.filter((filter) => !selectedTags.includes(removeAccents(filter).toLowerCase()))
-
-    return filterList */
-
     /** Version sans filter **/
     let tempFilterList = recipes.map(filterFunc).flat()
     let filterList = []
