@@ -1,6 +1,5 @@
 import { recipes } from "../data/recipes.js"
 import { displayCards } from "./factories/cardFactory.js"
-import { searchRecipes } from "./utils/searchRecipes.js"
 import { searchInFilter, searchByIngredient, searchByAppliance, searchByUstensil } from "./utils/searchInFilter.js"
 import { createTag } from "./factories/createTag.js"
 import { removeAccents } from "./utils/removeAccent.js"
@@ -35,7 +34,6 @@ function addTag(tag, category) {
     }
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
     updateRecipesByTags()
-    //advancedFilters.forEach(updateFilterList) // Met à jour les listes de filtres
 }
 /** La fonction removeTag permet de supprimer le tag dans sa variable (selectedIngredientTags, selectedApplianceTags ou selectedUstensilTags) **/
 function removeTag(tag, category) {
@@ -55,7 +53,7 @@ function removeTag(tag, category) {
             break
     }
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
-    recipesFiltered = searchRecipes(recipeRequest, recipes)
+    recipesFiltered = filterRecipesWithLoop(recipeRequest, recipes)
     updateRecipesByTags()
 }
 
@@ -67,7 +65,6 @@ function updateRecipesByTags() {
 
     // Utilise une boucle for pour parcourir toutes les recettes
     for (let i = 0; i < recipesFiltered.length; i++) {
-        // Accéde à la recette
         let recipe = recipesFiltered[i]
 
         // Vérifie si la recette correspond aux critères des tags
@@ -201,7 +198,7 @@ function createFilterList(recipes, filterFunc, selectedTags) {
             filterList.push(filterFormatted)
         }
     }
-    filterList = [...new Set(filterList)] // Pour enlever les doublons après la conversion
+    filterList = [...new Set(filterList)] // Enlève les doublons après la conversion
 
     return filterList
 }
@@ -282,12 +279,8 @@ function fillContainer() {
     }
     nbOfRecipe = recipesFiltered.length
     displayNumberOfRecipe(nbOfRecipe)
-    for (let i = 0; i < advancedFilters.length; i++) {
-        updateFilterList(advancedFilters[i])
-    } // Met à jour les listes de filtres
 }
-/** Exécution de la funtion fillContainer au chargement de la page **/
-fillContainer()
+window.onload = fillContainer() /** Exécution de la funtion fillContainer au chargement de la page **/
 
 /** Function displayNumberOfRecipe qui permet d'afficher le nombre de recettes en temps réel **/
 /** Cette function se base sur le nombre de recettes de recipes.js **/
@@ -295,18 +288,33 @@ function displayNumberOfRecipe(nbOfRecipe) {
     numberOfRecipes.textContent = nbOfRecipe + (nbOfRecipe <= 1 ? " recette" : " recettes")
 }
 
+/** Fonction de recherche pour la grosse barre de recherche **/
+function filterRecipesWithLoop(recipeRequest, recipesToFilter) {
+    let filteredRecipes = []
+    for (let i = 0; i < recipesToFilter.length; i++) {
+        let recipe = recipesToFilter[i]
+        if (
+            removeAccents(recipe.name).toLowerCase().includes(recipeRequest) ||
+            removeAccents(recipe.description).toLowerCase().includes(recipeRequest) ||
+            recipe.ingredients.some((ing) => removeAccents(ing.ingredient).toLowerCase().includes(recipeRequest))
+        ) {
+            filteredRecipes.push(recipe)
+        }
+    }
+
+    return filteredRecipes
+}
+
 /** Effectue la recherche si la longueur de la chaîne est supérieure à 2 ou si l'utilisateur appuie sur Backspace. **/
 inputSearchBar.addEventListener("input", (e) => {
     if (e.inputType === "deleteContentBackward") {
-        recipeRequest = removeAccents(e.target.value.toLowerCase()) //Ajouté pour éviter de reset l'affichage si l'utilisateur retire le contenu de inputSearchBar avant de retirer un tag
+        recipeRequest = removeAccents(e.target.value.toLowerCase())
         recipesFiltered = recipes
         updateRecipesByTags()
     }
     if (inputSearchBar.value.length > 2) {
         recipeRequest = removeAccents(e.target.value.toLowerCase())
-        recipesFiltered = searchRecipes(recipeRequest, recipesFiltered)
-    }
-    if (inputSearchBar.value.length > 2 || e.inputType === "deleteContentBackward") {
-        fillContainer()
+        recipesFiltered = filterRecipesWithLoop(recipeRequest, recipesFiltered)
+        fillContainer() // Cette fonction affiche les recettes filtrées.
     }
 })
