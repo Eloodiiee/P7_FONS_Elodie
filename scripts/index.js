@@ -53,7 +53,7 @@ function removeTag(tag, category) {
             break
     }
     // Mise à jour de l'affichage des recettes en fonction des tags sélectionnés
-    recipesFiltered = filterRecipesWithLoop(recipeRequest, recipes)
+    filterRecipesWithLoop(recipeRequest, recipes)
     updateRecipesByTags()
 }
 
@@ -82,7 +82,7 @@ function updateRecipesByTags() {
     recipesFiltered = newRecipesFiltered
 
     // Remplit le conteneur avec les recettes filtrées
-    fillContainer()
+    filterRecipesWithLoop(recipeRequest, recipesFiltered)
 }
 
 /** La fonction "tagHandler" permet de pouvoir effectuer une recherche à partir des tags sélectionnés.  **/
@@ -264,23 +264,7 @@ function updateLiList(filterList, liList, inputTag, advancedFilter) {
         })
     }
 }
-
-/** Function fillContainer permet d'afficher toutes les cartes de recette, **/
-/** au chargement de la page et en fonction du résultat de la recherche. **/
-function fillContainer() {
-    recipesContainer.innerHTML = ""
-    for (let i = 0; i < recipesFiltered.length; i++) {
-        const recipe = recipesFiltered[i]
-        card = displayCards(recipe)
-        recipesContainer.appendChild(card)
-    }
-    for (let i = 0; i < advancedFilters.length; i++) {
-        updateFilterList(advancedFilters[i])
-    }
-    nbOfRecipe = recipesFiltered.length
-    displayNumberOfRecipe(nbOfRecipe)
-}
-window.onload = fillContainer() /** Exécution de la funtion fillContainer au chargement de la page **/
+window.onload = filterRecipesWithLoop(recipeRequest, recipes) /** Exécution de la funtion filterRecipesWithLoop au chargement de la page **/
 
 /** Function displayNumberOfRecipe qui permet d'afficher le nombre de recettes en temps réel **/
 /** Cette function se base sur le nombre de recettes de recipes.js **/
@@ -301,8 +285,18 @@ function filterRecipesWithLoop(recipeRequest, recipesToFilter) {
             filteredRecipes.push(recipe)
         }
     }
-
-    return filteredRecipes
+    recipesFiltered = filteredRecipes
+    recipesContainer.innerHTML = ""
+    for (let i = 0; i < recipesFiltered.length; i++) {
+        const recipe = recipesFiltered[i]
+        card = displayCards(recipe)
+        recipesContainer.appendChild(card)
+    }
+    nbOfRecipe = recipesFiltered.length
+    displayNumberOfRecipe(nbOfRecipe)
+    for (let i = 0; i < advancedFilters.length; i++) {
+        updateFilterList(advancedFilters[i])
+    }
 }
 
 /** Effectue la recherche si la longueur de la chaîne est supérieure à 2 ou si l'utilisateur appuie sur Backspace. **/
@@ -314,7 +308,6 @@ inputSearchBar.addEventListener("input", (e) => {
     }
     if (inputSearchBar.value.length > 2) {
         recipeRequest = removeAccents(e.target.value.toLowerCase())
-        recipesFiltered = filterRecipesWithLoop(recipeRequest, recipesFiltered)
-        fillContainer() // Cette fonction affiche les recettes filtrées.
+        filterRecipesWithLoop(recipeRequest, recipesFiltered)
     }
 })
